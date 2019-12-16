@@ -97,7 +97,7 @@ public class MainController extends TelegramLongPollingBot {
                     telegramApiService.approveSong(user);
                 } else {
                     telegramUserService.deleteByChatId(chatId);
-                    response.setText("Введите название песни");
+                    response.setText(" Введите название песни");
                     try {
                         execute(response);
                     } catch (TelegramApiException e) {
