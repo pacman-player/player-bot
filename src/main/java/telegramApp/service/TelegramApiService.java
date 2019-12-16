@@ -15,12 +15,12 @@ public class TelegramApiService {
     }
 
     public TelegramUser sendSong(TelegramUser telegramUser) {
-        String URL = "http://localhost:8080/tlg/song";
+        String URL = "http://localhost:8080/api/tlg/song";
         return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
     }
 
-    public TelegramUser approveSong (TelegramUser telegramUser) {
-        String URL = "http://localhost:8080/tlg/approve";
+    public TelegramUser approveSong(TelegramUser telegramUser) {
+        String URL = "http://localhost:8080/api/tlg/approve";
         return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
     }
 

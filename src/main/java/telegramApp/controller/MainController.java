@@ -1,6 +1,5 @@
 package telegramApp.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,18 +36,13 @@ public class MainController extends TelegramLongPollingBot {
         response.setChatId(tlgUser.getChatId());
         if (tlgUser.getTrack() != null) {
 
-            String songName = tlgUser.getSongName();
-            System.out.println(tlgUser.getChatId() + " song: " + songName);
-
             sendAudio.setAudio(tlgUser.getTrack());
             sendAudio.setChatId(tlgUser.getChatId());
 
-            String text = "Это нужная песня? (Введите \"да\" если это та песня)";
-
-            response.setText(text);
+            response.setText("Это нужная песня? (Введите \"да\" если это та песня)");
 
             telegramUserService.addTelegramUser(tlgUser);
-            System.out.println(tlgUser.getSongId());
+
             try {
                 execute(sendAudio);
                 execute(response);
@@ -73,14 +67,9 @@ public class MainController extends TelegramLongPollingBot {
         Long chatId = tlgUser.getChatId();
         SendMessage response = new SendMessage();
         response.setChatId(tlgUser.getChatId());
-        System.out.println(tlgUser.getChatId() + " song: " + tlgUser.getSongName());
-
-        String text = "Всё ок";
-
-        response.setText(text);
+        response.setText("Всё ок");
 
         telegramUserService.deleteByChatId(chatId);
-        System.out.println("approved" + tlgUser.getSongId());
         try {
             execute(response);
         } catch (TelegramApiException e) {
@@ -105,13 +94,6 @@ public class MainController extends TelegramLongPollingBot {
             } else {
                 if (text.equals("да")) {
                     TelegramUser user = telegramUserService.findByChatId(chatId);
-                    response.setText("Ждите подтверждения");
-
-                    try {
-                        execute(response);
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
                     telegramApiService.approveSong(user);
                 } else {
                     telegramUserService.deleteByChatId(chatId);

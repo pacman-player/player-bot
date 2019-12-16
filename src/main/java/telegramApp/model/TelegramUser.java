@@ -12,12 +12,9 @@ public class TelegramUser {
     @Id
     private Long chatId;
     private String songName;
-
     private Long songId;
     @Transient
     private File track;
-
-    private String messageFromServer;
 
     public TelegramUser() {
     }
@@ -54,11 +51,4 @@ public class TelegramUser {
         this.track = track;
     }
 
-    public String getMessageFromServer() {
-        return messageFromServer;
-    }
-
-    public void setMessageFromServer(String messageFromServer) {
-        this.messageFromServer = messageFromServer;
-    }
 }
