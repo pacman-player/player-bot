@@ -1,10 +1,11 @@
 package telegramApp.service;
 
-import telegramApp.model.TelegramUser;
+import telegramApp.dto.SongRequest;
+import telegramApp.dto.SongResponce;
 
 public interface TelegramApiService {
 
-    public TelegramUser sendSong(TelegramUser telegramUser);
+    SongResponce sendAutorAndSongName(SongRequest telegramMessage);
 
-    public TelegramUser approveSong(TelegramUser telegramUser) ;
+    SongRequest approveSong(SongRequest telegramMessage) ;
 }
