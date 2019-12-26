@@ -7,5 +7,5 @@ public interface TelegramApiService {
 
     SongResponce sendAutorAndSongName(SongRequest telegramMessage);
 
-    SongRequest approveSong(SongRequest telegramMessage) ;
+    SongResponce approveSong(SongRequest telegramMessage) ;
 }

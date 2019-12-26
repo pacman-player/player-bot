@@ -21,9 +21,7 @@ import java.util.List;
 @PropertySource("classpath:telegram.properties")
 public class Bot extends TelegramLongPollingBot {
 
-
     private final TelegramMessageService telegramMessageService;
-
 
     private final TelegramApiService telegramApiService;
 
@@ -37,7 +35,6 @@ public class Bot extends TelegramLongPollingBot {
         this.telegramMessageService = telegramMessageService;
         this.telegramApiService = telegramApiService;
     }
-
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -63,7 +60,7 @@ public class Bot extends TelegramLongPollingBot {
 
         } else {
             context = new BotContext(this, telegramMessage, text);
-            state = BotState.byId(telegramMessage.getStatetId());
+            state = BotState.byId(telegramMessage.getStateId());
         }
 
         state.handleInput(context);
@@ -74,8 +71,7 @@ public class Bot extends TelegramLongPollingBot {
         }
         while (!state.isInputNeeded());
 
-        context.getTelegramMessage().setSongId(telegramMessage.getSongId());
-        telegramMessage.setStatetId(state.ordinal());
+        telegramMessage.setStateId(state.ordinal());
         telegramMessageService.updateTelegramUser(telegramMessage);
     }
 

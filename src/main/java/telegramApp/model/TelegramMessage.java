@@ -11,27 +11,25 @@ public class TelegramMessage {
 
     @Id
     private Long chatId;
-    private int statetId;
+    private int stateId;
     private String performerName;
     private String songName;
     private Long songId;
-    @Transient
-    private File track;
 
     public TelegramMessage() {
     }
 
-    public TelegramMessage(Long chatId, int statetId) {
+    public TelegramMessage(Long chatId, int stateId) {
         this.chatId = chatId;
-        this.statetId = statetId;
+        this.stateId = stateId;
     }
 
-    public int getStatetId() {
-        return statetId;
+    public int getStateId() {
+        return stateId;
     }
 
-    public void setStatetId(int statetId) {
-        this.statetId = statetId;
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
     }
 
     public String getPerformerName() {
@@ -66,22 +64,5 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
-    public File getTrack() {
-        return track;
-    }
 
-    public void setTrack(File track) {
-        this.track = track;
-    }
-
-    @Override
-    public String toString() {
-        return "TelegramMessage{" +
-                "chatId=" + chatId +
-                ", statetId=" + statetId +
-                ", performerName='" + performerName + '\'' +
-                ", songName='" + songName + '\'' +
-                ", songId=" + songId +
-                '}';
-    }
 }
