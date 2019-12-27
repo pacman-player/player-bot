@@ -1,16 +1,16 @@
 package telegramApp.dto;
 
-public class SongResponce {
+public class SongResponse {
 
     private Long chatId;
     private Long songId;
     private byte[] track;
     private String trackName;
 
-    public SongResponce() {
+    public SongResponse() {
     }
 
-    public SongResponce(Long chatId, Long songId, byte[] track, String trackName) {
+    public SongResponse(Long chatId, Long songId, byte[] track, String trackName) {
         this.chatId = chatId;
         this.songId = songId;
         this.track = track;

@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.SongResponce;
+import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
@@ -58,14 +58,14 @@ public enum BotState {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
             try {
-                SongResponce songResponce = context.getBot().sendToServer(context.getTelegramMessage());
-                Long songId = songResponce.getSongId();
+                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
+                Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
                 context.getBot().saveTelegramMessage(telegramMessage);
 
                 sendMessage(context, "Песня загружается...");
-                sendTrack(context, songResponce);
+                sendTrack(context, songResponse);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 sendMessage(context, "Такая песня не найдена");
@@ -174,10 +174,10 @@ public enum BotState {
         }
     }
 
-    protected void sendTrack(BotContext context, SongResponce songResponce) {
+    protected void sendTrack(BotContext context, SongResponse songResponse) {
         SendAudio sendAudio = new SendAudio();
-        sendAudio.setAudio(songResponce.getTrackName(), new ByteArrayInputStream(songResponce.getTrack()));
-        sendAudio.setChatId(songResponce.getChatId());
+        sendAudio.setAudio(songResponse.getTrackName(), new ByteArrayInputStream(songResponse.getTrack()));
+        sendAudio.setChatId(songResponse.getChatId());
 
         try {
             context.getBot().execute(sendAudio);

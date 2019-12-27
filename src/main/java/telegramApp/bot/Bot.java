@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponce;
+import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
@@ -75,7 +75,7 @@ public class Bot extends TelegramLongPollingBot {
         telegramMessageService.updateTelegramUser(telegramMessage);
     }
 
-    public SongResponce sendToServer(TelegramMessage telegramMessage) {
+    public SongResponse sendToServer(TelegramMessage telegramMessage) {
         SongRequest songRequest = new SongRequest(telegramMessage);
         return telegramApiService.sendAutorAndSongName(songRequest);
     }
