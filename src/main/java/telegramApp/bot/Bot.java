@@ -34,6 +34,9 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
 
+    @Value("${bot.providerToken}")
+    private String providerToken;
+
     public Bot(TelegramMessageService telegramMessageService, TelegramApiService telegramApiService) {
         this.telegramMessageService = telegramMessageService;
         this.telegramApiService = telegramApiService;
@@ -164,5 +167,9 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return botName;
+    }
+
+    public String getProviderToken() {
+        return providerToken;
     }
 }

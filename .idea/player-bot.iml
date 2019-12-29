@@ -117,7 +117,7 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.5.8" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.h2database:h2:1.4.199" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: mysql:mysql-connector-java:8.0.15" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE" level="project" />
   </component>
 </module>
