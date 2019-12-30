@@ -2,17 +2,21 @@ package telegramApp.bot;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
+import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
+import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public enum BotState {
-
 
     Start(false) {
         @Override
@@ -36,7 +40,6 @@ public enum BotState {
         public void handleInput(BotContext context) {
             String performerName = context.getInput();
             context.getTelegramMessage().setPerformerName(performerName);
-
         }
 
         @Override
@@ -86,7 +89,6 @@ public enum BotState {
 
         @Override
         public void enter(BotContext context) {
-
             ReplyKeyboardMarkup customReplyKeyboardMarkup = context.getBot().getCustomReplyKeyboardMarkup();
             SendMessage message = new SendMessage()
                     .setChatId(context.getTelegramMessage().getChatId())
@@ -98,14 +100,12 @@ public enum BotState {
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
-
         }
 
         public void handleInput(BotContext context) {
             String text = context.getInput();
-
             if (text.equals("Да")) {
-                next = Approved;
+                next = Payment;
             } else {
                 next = EnterPerformerName;
             }
@@ -115,28 +115,68 @@ public enum BotState {
         public BotState nextState() {
             return next;
         }
+    },
 
+    Payment {
+        private BotState next;
+
+        @Override
+        public void enter(BotContext context) {
+            SendInvoice invoice = new SendInvoice();
+            invoice.setChatId(context.getTelegramMessage().getChatId().intValue());
+            invoice.setProviderToken(context.getBot().getProviderToken());
+            invoice.setTitle("Оплата услуги");
+            invoice.setDescription("Для добавления песни в очередь пожалуйста оплатите услугу.");
+            invoice.setPayload("pacman-player" + context.getTelegramMessage().getChatId());
+            invoice.setStartParameter("payment-invoice");
+            invoice.setCurrency("RUB");
+            List<LabeledPrice> labeledPrices = new ArrayList<>();
+            labeledPrices.add(new LabeledPrice("1 song", 6500));
+            invoice.setPrices(labeledPrices);
+
+            try {
+                context.getBot().execute(invoice);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void handleInput(BotContext context) {
+            SuccessfulPayment successfulPayment = context.getSuccessfulPayment();
+            if (successfulPayment != null && successfulPayment.getInvoicePayload().startsWith("pacman-player")) {
+                sendMessage(context, "Спасибо за оплату");
+                TelegramMessage telegramMessage = context.getBot().getTelegramMessageFromDB(context.getTelegramMessage().getChatId());
+                context.getBot().sendSongIdToServer(telegramMessage);
+                next = Approved;
+            } else {
+                sendMessage(context, "Оплата не прошла, попробуйте снова");
+                next = Payment;
+            }
+        }
+
+        @Override
+        public BotState nextState() {
+            return next;
+        }
     },
 
     Approved(false) {
         @Override
         public void enter(BotContext context) {
-
             try {
                 context.getBot().sendSongIdToServer(context.getTelegramMessage());
-                sendMessage(context, "Всё ок. Вы можете заказать ещё одну.");
+                sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
             } catch (Exception ex) {
                 ex.printStackTrace();
                 sendMessage(context, "Что-то пошло не так");
             }
-
         }
 
         @Override
         public BotState nextState() {
             return EnterPerformerName;
         }
-
     };
 
     private static BotState[] states;
@@ -150,8 +190,7 @@ public enum BotState {
         this.inputNeeded = inputNeeded;
     }
 
-
-    public static BotState geInitialState() {
+    public static BotState getInitialState() {
         return byId(0);
     }
 
@@ -159,7 +198,6 @@ public enum BotState {
         if (states == null) {
             states = BotState.values();
         }
-
         return states[id];
     }
 
@@ -190,8 +228,7 @@ public enum BotState {
         return inputNeeded;
     }
 
-    public void handleInput(BotContext context) {
-    }
+    public void handleInput(BotContext context) {}
 
     public abstract void enter(BotContext context);
 
