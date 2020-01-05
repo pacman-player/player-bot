@@ -5,7 +5,9 @@ import telegramApp.dto.SongResponse;
 
 public interface TelegramApiService {
 
-    SongResponse sendAutorAndSongName(SongRequest telegramMessage);
+    SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
 
-    void approveSong(SongRequest telegramMessage) ;
+    void approveSong(SongRequest telegramMessage);
+
+    void addSongToQueue(long songId, long companyId);
 }
