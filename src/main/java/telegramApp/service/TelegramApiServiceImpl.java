@@ -34,7 +34,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     public void addSongToQueue(long songId, long companyId) {
-        String URL = "http://localhost:8080/api/tlg/addSongToQueue";
+        String URL = serverPath + "/api/tlg/addSongToQueue";
         HttpHeaders headers = new HttpHeaders();
         headers.add("songId", String.valueOf(songId));
         headers.add("companyId", String.valueOf(companyId));
