@@ -1,7 +1,9 @@
 package telegramApp.bot;
 
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
@@ -61,13 +63,17 @@ public enum BotState {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
             try {
+                SendChatAction sendAction = new SendChatAction();
+
                 SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
                 context.getBot().saveTelegramMessage(telegramMessage);
-
                 sendMessage(context, "Песня загружается...");
+                //показывает действия собеседника
+                sendAction(context, songResponse.getChatId());
+
                 sendTrack(context, songResponse);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -223,6 +229,20 @@ public enum BotState {
             e.printStackTrace();
         }
     }
+
+    //показывает действия собеседника
+    protected void sendAction(BotContext context, Long chatId){
+        SendChatAction sendAction = new SendChatAction();
+        sendAction.setAction(ActionType.UPLOADAUDIO);
+        sendAction.setChatId(chatId);
+
+        try {
+            context.getBot().execute(sendAction);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public boolean isInputNeeded() {
         return inputNeeded;
