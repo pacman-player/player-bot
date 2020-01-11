@@ -72,7 +72,7 @@ public enum BotState {
                 context.getBot().saveTelegramMessage(telegramMessage);
                 sendMessage(context, "Песня загружается...");
                 //показывает действия собеседника
-                sendAction(context, songResponse.getChatId());
+                sendAction(context, songResponse.getChatId(), ActionType.UPLOADAUDIO);
 
                 sendTrack(context, songResponse);
             } catch (Exception ex) {
@@ -231,9 +231,9 @@ public enum BotState {
     }
 
     //показывает действия собеседника
-    protected void sendAction(BotContext context, Long chatId){
+    protected void sendAction(BotContext context, Long chatId, ActionType actionType){
         SendChatAction sendAction = new SendChatAction();
-        sendAction.setAction(ActionType.UPLOADAUDIO);
+        sendAction.setAction(actionType);
         sendAction.setChatId(chatId);
 
         try {
