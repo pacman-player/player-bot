@@ -2,10 +2,7 @@ package telegramApp.bot;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
-import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
-import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
-import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -14,6 +11,7 @@ import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,14 +61,12 @@ public enum BotState {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
             try {
-                SendChatAction sendAction = new SendChatAction();
-
+                sendMessage(context, "Песня загружается...");
                 SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
                 context.getBot().saveTelegramMessage(telegramMessage);
-                sendMessage(context, "Песня загружается...");
                 //показывает действия собеседника
                 sendAction(context, songResponse.getChatId(), ActionType.UPLOADAUDIO);
 
@@ -242,7 +238,6 @@ public enum BotState {
             e.printStackTrace();
         }
     }
-
 
     public boolean isInputNeeded() {
         return inputNeeded;
