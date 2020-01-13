@@ -123,8 +123,9 @@ public enum BotState {
         @Override
         public void enter(BotContext context) {
             SendInvoice invoice = new SendInvoice();
+
             invoice.setChatId(context.getTelegramMessage().getChatId().intValue());
-            invoice.setProviderToken(context.getBot().getProviderToken());
+//            invoice.setProviderToken(context.getBot().getProviderToken());
             invoice.setTitle("Оплата услуги");
             invoice.setDescription("Для добавления песни в очередь пожалуйста оплатите услугу.");
             invoice.setPayload("pacman-player" + context.getTelegramMessage().getChatId());
