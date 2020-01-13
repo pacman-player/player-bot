@@ -3,7 +3,6 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -12,7 +11,6 @@ import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +60,7 @@ public enum BotState {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
             sendMessage(context, "Песня загружается...");
-            sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif");
+            sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
@@ -239,10 +237,12 @@ public enum BotState {
         }
     }
 
-    protected void sendAnimation(BotContext context, String photo){
+    protected void sendAnimation(BotContext context, String url, int width, int height){
         SendAnimation sendAnimation = new SendAnimation();
         sendAnimation.setChatId(context.getTelegramMessage().getChatId());
-        sendAnimation.setAnimation(photo);
+        sendAnimation.setAnimation(url);
+        sendAnimation.setWidth(width);
+        sendAnimation.setHeight(height);
 
         try {
             context.getBot().execute(sendAnimation);
