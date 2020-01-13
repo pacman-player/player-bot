@@ -3,6 +3,7 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -60,16 +61,15 @@ public enum BotState {
         public void handleInput(BotContext context) {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
+            sendMessage(context, "Песня загружается...");
+            sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif");
+            sendAction(context, ActionType.UPLOADAUDIO);
             try {
-                sendMessage(context, "Песня загружается...");
                 SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
                 context.getBot().saveTelegramMessage(telegramMessage);
-                //показывает действия собеседника
-                sendAction(context, songResponse.getChatId(), ActionType.UPLOADAUDIO);
-
                 sendTrack(context, songResponse);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -217,7 +217,7 @@ public enum BotState {
     protected void sendTrack(BotContext context, SongResponse songResponse) {
         SendAudio sendAudio = new SendAudio();
         sendAudio.setAudio(songResponse.getTrackName(), new ByteArrayInputStream(songResponse.getTrack()));
-        sendAudio.setChatId(songResponse.getChatId());
+        sendAudio.setChatId(context.getTelegramMessage().getChatId());
 
         try {
             context.getBot().execute(sendAudio);
@@ -227,13 +227,25 @@ public enum BotState {
     }
 
     //показывает действия собеседника
-    protected void sendAction(BotContext context, Long chatId, ActionType actionType){
+    protected void sendAction(BotContext context, ActionType actionType){
         SendChatAction sendAction = new SendChatAction();
         sendAction.setAction(actionType);
-        sendAction.setChatId(chatId);
+        sendAction.setChatId(context.getTelegramMessage().getChatId());
 
         try {
             context.getBot().execute(sendAction);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void sendAnimation(BotContext context, String photo){
+        SendAnimation sendAnimation = new SendAnimation();
+        sendAnimation.setChatId(context.getTelegramMessage().getChatId());
+        sendAnimation.setAnimation(photo);
+
+        try {
+            context.getBot().execute(sendAnimation);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
