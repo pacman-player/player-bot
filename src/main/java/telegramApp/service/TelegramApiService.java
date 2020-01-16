@@ -10,4 +10,5 @@ public interface TelegramApiService {
     void approveSong(SongRequest telegramMessage);
 
     void addSongToQueue(long songId, long companyId);
+    SongResponse approveSong(SongRequest telegramMessage) ;
 }
