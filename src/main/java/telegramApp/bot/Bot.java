@@ -128,6 +128,11 @@ public class Bot extends TelegramLongPollingBot {
         return telegramApiService.sendAutorAndSongName(songRequest);
     }
 
+    SongResponse approveToServer(TelegramMessage telegramMessage) {
+        SongRequest songRequest = new SongRequest(telegramMessage);
+        return telegramApiService.approveSong(songRequest);
+    }
+
     void sendSongIdToServer(TelegramMessage telegramMessage) {
         SongRequest songRequest = new SongRequest(telegramMessage);
         telegramApiService.approveSong(songRequest);

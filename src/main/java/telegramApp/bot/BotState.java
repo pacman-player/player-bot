@@ -63,7 +63,7 @@ public enum BotState {
             sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
-                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
+                SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
@@ -105,6 +105,8 @@ public enum BotState {
         public void handleInput(BotContext context) {
             String text = context.getInput();
             if (text.equals("Да")) {
+                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
+                sendTrack(context, songResponse);
                 next = Payment;
             } else {
                 next = EnterPerformerName;
