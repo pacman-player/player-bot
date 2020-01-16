@@ -10,8 +10,9 @@
 - Если увидите "org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error removing old webhook", это оно!  
 
 1.1) Чтобы обойти блокировку
-- Сам VPN брать здесь: https://openvpn.net/community-downloads/
-- Параметры для входа здесь:https://www.freeopenvpn.org/en/logpass/netherlands.php
+- Скачиваем и устанавливаем VPN отсюда: https://openvpn.net/community-downloads/
+- Параметры для входа берем здесь:https://www.freeopenvpn.org/en/logpass/netherlands.php
+  Параметры обновляются каждый день. Если не получается зайти - обновляем страницу и вводим новые данные
   Если пароль показан как \*Bloked\* - нужно отключить блокировку рекламы на странице (AdBlock и ему подобные)
 
 2) Запустите основное приложение "player-Core"  
