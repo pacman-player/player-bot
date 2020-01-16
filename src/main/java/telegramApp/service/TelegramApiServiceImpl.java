@@ -23,7 +23,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
                 .build();
     }
 
-    public SongResponse sendAutorAndSongName(SongRequest songRequest) {
+    public SongResponse sendAuthorAndSongName(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/song";
         return restTemplate.postForObject(URL, songRequest, SongResponse.class);
     }
