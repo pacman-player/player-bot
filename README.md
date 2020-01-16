@@ -9,6 +9,10 @@
 - !!! Чтобы запустить бота, убедитесь, что он не заблокирован в вашем регионе!!!  
 - Если увидите "org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error removing old webhook", это оно!  
 
+1.1) Чтобы обойти блокировку
+- Сам VPN брать здесь: https://openvpn.net/community-downloads/
+- Параметры для входа здесь:https://www.freeopenvpn.org/en/logpass/netherlands.php
+  Если пароль показан как *Bloked* - нужно отключить блокировку рекламы на странице (AdBlock и ему подобные)
 
 2) Запустите основное приложение "player-Core"  
 - При обходе блокировки телеграм бота убедитесь, что с того же региона не заблокированы сервисы поиска музыки.  
