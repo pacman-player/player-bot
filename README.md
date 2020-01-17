@@ -7,7 +7,8 @@
 # Для теста
 1) Запустите бота  
 - !!! Чтобы запустить бота, убедитесь, что он не заблокирован в вашем регионе!!!  
-- Если увидите "org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error removing old webhook", это оно!  
+- Если увидите "org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Error removing old webhook", это оно! 
+- БД для отслеживания состояния сообщений бота: CREATE DATABASE `tlg_bot` /\*!40100 DEFAULT CHARACTER SET utf8mb4 \*/;
 
 1.1) Чтобы обойти блокировку
 - Скачиваем и устанавливаем VPN отсюда: https://openvpn.net/community-downloads/
