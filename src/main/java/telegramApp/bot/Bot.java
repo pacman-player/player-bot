@@ -49,7 +49,7 @@ public class Bot extends TelegramLongPollingBot {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         KeyboardButton keyboardButton = new KeyboardButton();
 
-        keyboardButton.setText("Тык");
+        keyboardButton.setText("Отправить местоположение");
         keyboardButton.setRequestLocation(true);
 
         KeyboardRow keyboardButtonsRow = new KeyboardRow();
@@ -61,7 +61,7 @@ public class Bot extends TelegramLongPollingBot {
 
         keyboardMarkup.setKeyboard(rowList);
 
-        SendMessage example = new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(keyboardMarkup);
+        SendMessage example = new SendMessage().setChatId(chatId).setText("Отправьте местоположение, чтобы бот мог определить ваше заведение").setReplyMarkup(keyboardMarkup);
 
         return example;
     }
@@ -94,6 +94,8 @@ public class Bot extends TelegramLongPollingBot {
             if(update.getMessage().getText().equals("/start")){
                 try {
                     execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
+
+
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
