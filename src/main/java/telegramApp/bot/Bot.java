@@ -46,31 +46,22 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public static SendMessage sendInlineKeyBoardMessage(long chatId) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
-        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        KeyboardButton keyboardButton = new KeyboardButton();
 
-        inlineKeyboardButton1.setText("Тык");
-        inlineKeyboardButton1.setCallbackData("Button \"Тык\" has been pressed");
+        keyboardButton.setText("Тык");
+        keyboardButton.setRequestLocation(true);
 
-        inlineKeyboardButton2.setText("Тык2");
-        inlineKeyboardButton2.setCallbackData("Button \"Тык2\" has been pressed");
+        KeyboardRow keyboardButtonsRow = new KeyboardRow();
 
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
+        keyboardButtonsRow.add(keyboardButton);
 
-        keyboardButtonsRow1.add(inlineKeyboardButton1);
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Fi4a").setCallbackData("CallFi4a"));
+        List<KeyboardRow> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow);
 
-        keyboardButtonsRow2.add(inlineKeyboardButton2);
+        keyboardMarkup.setKeyboard(rowList);
 
-        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-        rowList.add(keyboardButtonsRow1);
-        rowList.add(keyboardButtonsRow2);
-
-        inlineKeyboardMarkup.setKeyboard(rowList);
-
-        SendMessage example = new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(inlineKeyboardMarkup);
+        SendMessage example = new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(keyboardMarkup);
 
         return example;
     }
@@ -83,6 +74,17 @@ public class Bot extends TelegramLongPollingBot {
 
         if (!update.hasMessage()) {
             paymentPreCheckout(update);
+
+            if(update.hasCallbackQuery()){
+                try {
+                    execute(new SendMessage().setText(
+                            update.getCallbackQuery().getData())
+                            .setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return;
         }
 
