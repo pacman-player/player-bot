@@ -45,27 +45,6 @@ public class Bot extends TelegramLongPollingBot {
         this.telegramApiService = telegramApiService;
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId) {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        KeyboardButton keyboardButton = new KeyboardButton();
-
-        keyboardButton.setText("Отправить местоположение");
-        keyboardButton.setRequestLocation(true);
-
-        KeyboardRow keyboardButtonsRow = new KeyboardRow();
-
-        keyboardButtonsRow.add(keyboardButton);
-
-        List<KeyboardRow> rowList = new ArrayList<>();
-        rowList.add(keyboardButtonsRow);
-
-        keyboardMarkup.setKeyboard(rowList);
-
-        SendMessage example = new SendMessage().setChatId(chatId).setText("Отправьте местоположение, чтобы бот мог определить ваше заведение").setReplyMarkup(keyboardMarkup);
-
-        return example;
-    }
-
     @Override
     public void onUpdateReceived(Update update) {
         BotContext context;
@@ -90,17 +69,6 @@ public class Bot extends TelegramLongPollingBot {
 
         if (update.getMessage().hasText()) {
             text = update.getMessage().getText();
-
-            if(update.getMessage().getText().equals("/start")){
-                try {
-                    execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
-
-
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
-            }
-
         } else {
             text = "";
         }

@@ -4,10 +4,14 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
@@ -22,6 +26,31 @@ public enum BotState {
         @Override
         public void enter(BotContext context) {
             sendMessage(context, "Привет");
+        }
+
+        @Override
+        public BotState nextState() {
+            return GeoLocation;
+        }
+    },
+
+    GeoLocation() {
+        private BotState next;
+
+        @Override
+        public void enter(BotContext context) {
+            sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение");
+        }
+
+        @Override
+        public void handleInput(BotContext context, Update update) throws TelegramApiValidationException {
+            sendInlineKeyBoardMessage(update.getMessage().getChatId());
+
+//            if ( ) {
+//                next = EnterPerformerName;
+//            } else {
+//                next = GeoLocation;
+//            }
         }
 
         @Override
@@ -190,6 +219,29 @@ public enum BotState {
         this.inputNeeded = inputNeeded;
     }
 
+    public static SendMessage sendInlineKeyBoardMessage(long chatId) throws TelegramApiValidationException {
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        KeyboardButton keyboardButton = new KeyboardButton();
+
+        keyboardButton.setText("Отправить местоположение");
+        keyboardButton.setRequestLocation(true);
+
+        KeyboardRow keyboardButtonsRow = new KeyboardRow();
+
+        keyboardButtonsRow.add(keyboardButton);
+
+        List<KeyboardRow> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow);
+
+        keyboardMarkup.setKeyboard(rowList);
+
+        SendMessage example = new SendMessage().setChatId(chatId).setText("Отправьте местоположение, чтобы бот мог определить ваше заведение").setReplyMarkup(keyboardMarkup);
+
+        example.validate();
+
+        return example;
+    }
+
     public static BotState getInitialState() {
         return byId(0);
     }
@@ -229,6 +281,7 @@ public enum BotState {
     }
 
     public void handleInput(BotContext context) {}
+    public void handleInput(BotContext context, Update update) throws TelegramApiValidationException {}
 
     public abstract void enter(BotContext context);
 
