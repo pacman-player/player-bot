@@ -43,8 +43,14 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context, Update update) throws TelegramApiValidationException {
-            sendInlineKeyBoardMessage(update.getMessage().getChatId());
+        public void handleInput(BotContext context, Update update) {
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
+            } catch (TelegramApiValidationException e) {
+                e.printStackTrace();
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
 
 //            if ( ) {
 //                next = EnterPerformerName;
@@ -281,7 +287,7 @@ public enum BotState {
     }
 
     public void handleInput(BotContext context) {}
-    public void handleInput(BotContext context, Update update) throws TelegramApiValidationException {}
+    public void handleInput(BotContext context, Update update) {}
 
     public abstract void enter(BotContext context);
 
