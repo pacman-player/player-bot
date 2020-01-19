@@ -28,9 +28,9 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         return restTemplate.postForObject(URL, songRequest, SongResponse.class);
     }
 
-    public void approveSong(SongRequest songRequest) {
+    public SongResponse approveSong(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/approve";
-        restTemplate.postForObject(URL, songRequest, void.class);
+        return restTemplate.postForObject(URL, songRequest, SongResponse.class);
     }
 
     public void addSongToQueue(long songId, long companyId) {
