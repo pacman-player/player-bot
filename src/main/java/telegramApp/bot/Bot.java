@@ -74,6 +74,10 @@ public class Bot extends TelegramLongPollingBot {
         final long chatId = update.getMessage().getChatId();
         TelegramMessage telegramMessage = telegramMessageService.findByChatId(chatId);
 
+        if (text.equals("/start")) {
+            telegramMessage = null;
+        }
+
         if (telegramMessage == null) {
             state = BotState.getInitialState();
             telegramMessage = new TelegramMessage(chatId, state.ordinal());

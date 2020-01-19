@@ -45,7 +45,7 @@ public enum BotState {
         @Override
         public void handleInput(BotContext context, Update update) {
             try {
-                context.getBot().execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
+                context.getBot().execute(sendKeyBoardMessage(update.getMessage().getChatId()));
             } catch (TelegramApiValidationException e) {
                 e.printStackTrace();
             } catch (TelegramApiException e) {
@@ -225,7 +225,7 @@ public enum BotState {
         this.inputNeeded = inputNeeded;
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId) throws TelegramApiValidationException {
+    public static SendMessage sendKeyBoardMessage(long chatId) throws TelegramApiValidationException {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         KeyboardButton keyboardButton = new KeyboardButton();
 
@@ -241,11 +241,9 @@ public enum BotState {
 
         keyboardMarkup.setKeyboard(rowList);
 
-        SendMessage example = new SendMessage().setChatId(chatId).setText("Отправьте местоположение, чтобы бот мог определить ваше заведение").setReplyMarkup(keyboardMarkup);
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Нажмите кнопку для отправки геоданных").setReplyMarkup(keyboardMarkup);
 
-        example.validate();
-
-        return example;
+        return sendMessage;
     }
 
     public static BotState getInitialState() {
