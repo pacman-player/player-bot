@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
@@ -99,8 +100,8 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
 
-        if (state.name().equals("GeoLocation")) {
-            state.handleInput(context, update.getMessage().getLocation());
+        if (state.name().equals("GeoLocation") & update.getMessage().getLocation() != null) {
+            state.handleInput(context, new LocationDto(update.getMessage().getLocation().getLatitude(), update.getMessage().getLocation().getLongitude()));
         } else {
             state.handleInput(context);
         }
@@ -161,6 +162,10 @@ public class Bot extends TelegramLongPollingBot {
     void sendSongIdToServer(TelegramMessage telegramMessage) {
         SongRequest songRequest = new SongRequest(telegramMessage);
         telegramApiService.approveSong(songRequest);
+    }
+
+    void sendGeoLocationToServer(LocationDto locationDto) {
+        telegramApiService.sendGeoLocation(locationDto);
     }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
