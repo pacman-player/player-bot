@@ -99,7 +99,12 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
 
-        state.handleInput(context);
+        if (state.name().equals("GeoLocation")) {
+            state.handleInput(context, update.getMessage().getLocation());
+        } else {
+            state.handleInput(context);
+        }
+
         do {
             state = state.nextState();
             state.enter(context);

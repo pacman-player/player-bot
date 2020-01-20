@@ -3,6 +3,7 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.objects.Location;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
@@ -53,7 +54,9 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context) {
+        public void handleInput(BotContext context, Location location) {
+            System.out.println(location);
+
             sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
@@ -317,6 +320,7 @@ public enum BotState {
 
     public void handleInput(BotContext context) {}
     public void handleInput(BotContext context, Update update) {}
+    public void handleInput(BotContext context, Location location) {}
 
     public abstract void enter(BotContext context);
 
