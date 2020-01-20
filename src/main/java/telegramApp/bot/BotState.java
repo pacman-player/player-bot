@@ -38,7 +38,7 @@ public enum BotState {
 
         @Override
         public void enter(BotContext context) {
-            sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение");
+            sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение \n\nили \n\nвыберите заведение из списка");
         }
 
         @Override
@@ -50,12 +50,11 @@ public enum BotState {
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
+        }
 
-//            if ( ) {
-//                next = EnterPerformerName;
-//            } else {
-//                next = GeoLocation;
-//            }
+        @Override
+        public void handleInput(BotContext context) {
+            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
         @Override
@@ -229,21 +228,24 @@ public enum BotState {
 
     public static SendMessage sendKeyBoardMessage(long chatId) throws TelegramApiValidationException {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        KeyboardButton keyboardButton = new KeyboardButton();
+        KeyboardButton keyboardButton1 = new KeyboardButton();
+        KeyboardButton keyboardButton2 = new KeyboardButton();
 
-        keyboardButton.setText("Отправить местоположение");
-        keyboardButton.setRequestLocation(true);
+        keyboardButton1.setText("Отправить местоположение");
+        keyboardButton2.setText("Показать список заведений");
+        keyboardButton1.setRequestLocation(true);
 
         KeyboardRow keyboardButtonsRow = new KeyboardRow();
 
-        keyboardButtonsRow.add(keyboardButton);
+        keyboardButtonsRow.add(keyboardButton1);
+        keyboardButtonsRow.add(keyboardButton2);
 
         List<KeyboardRow> rowList = new ArrayList<>();
         rowList.add(keyboardButtonsRow);
 
         keyboardMarkup.setKeyboard(rowList);
 
-        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Нажмите кнопку для отправки геоданных").setReplyMarkup(keyboardMarkup);
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Выберите ваш вариант:").setReplyMarkup(keyboardMarkup);
 
         return sendMessage;
     }
