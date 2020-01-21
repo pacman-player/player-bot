@@ -8,7 +8,7 @@ public interface TelegramApiService {
 
     SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
 
-    void sendGeoLocation(LocationDto locationDto);
+    Long sendGeoLocation(LocationDto locationDto);
 
     void addSongToQueue(long songId, long companyId);
 

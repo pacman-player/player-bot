@@ -164,8 +164,8 @@ public class Bot extends TelegramLongPollingBot {
         telegramApiService.approveSong(songRequest);
     }
 
-    void sendGeoLocationToServer(LocationDto locationDto) {
-        telegramApiService.sendGeoLocation(locationDto);
+    Long sendGeoLocationToServer(LocationDto locationDto) {
+        return telegramApiService.sendGeoLocation(locationDto);
     }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {

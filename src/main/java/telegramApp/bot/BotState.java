@@ -55,8 +55,7 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            context.getBot().sendGeoLocationToServer(locationDto);
-
+            companyId = context.getBot().sendGeoLocationToServer(locationDto);
             sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
@@ -224,6 +223,7 @@ public enum BotState {
     };
 
     private static BotState[] states;
+    public long companyId = 0;
     private final boolean inputNeeded;
 
     BotState() {

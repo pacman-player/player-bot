@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import telegramApp.dto.AddressDto;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
@@ -30,9 +31,10 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
-    public void sendGeoLocation(LocationDto locationDto) {
+    public Long sendGeoLocation(LocationDto locationDto) {
         String URL = serverPath + "/api/tlg/location";
-        restTemplate.postForObject(URL, locationDto, LocationDto.class);
+        AddressDto adress = restTemplate.postForObject(URL, locationDto, AddressDto.class);
+        return adress.getId();
     }
 
     public SongResponse approveSong(SongRequest songRequest) {
