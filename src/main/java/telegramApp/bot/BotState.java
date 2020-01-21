@@ -11,13 +11,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
+import telegramApp.dto.CompanyDto;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public enum BotState {
@@ -55,13 +55,18 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            companyId = context.getBot().sendGeoLocationToServer(locationDto);
-            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
+            List company = context.getBot().sendGeoLocationToServer(locationDto);
+            if(company.isEmpty()){
+                sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
+            }
+            companyId = Long.parseLong(company.get(0).toString());
+            sendMessage(context, "Список заведений: \n" + company.toString());
         }
 
         @Override
         public void handleInput(BotContext context) {
-            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
+            context.getBot().getAllCompany();
+            sendMessage(context, "Список заведений: \n" + context.getBot().getAllCompany());
         }
 
         @Override

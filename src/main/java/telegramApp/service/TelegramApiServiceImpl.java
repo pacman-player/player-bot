@@ -7,10 +7,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.AddressDto;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
+import telegramApp.dto.*;
+
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Service
 @PropertySource("classpath:telegram.properties")
@@ -31,10 +32,14 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
-    public Long sendGeoLocation(LocationDto locationDto) {
+    public List sendGeoLocation(LocationDto locationDto) {
         String URL = serverPath + "/api/tlg/location";
-        AddressDto adress = restTemplate.postForObject(URL, locationDto, AddressDto.class);
-        return adress.getId();
+        return restTemplate.postForObject(URL, locationDto, List.class);
+    }
+
+    public List getAllCompany() {
+        String URL = serverPath + "/api/tlg/all_company";
+        return restTemplate.postForObject(URL, null, List.class);
     }
 
     public SongResponse approveSong(SongRequest songRequest) {

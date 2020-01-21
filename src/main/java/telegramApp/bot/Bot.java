@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import telegramApp.dto.CompanyDto;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
@@ -20,6 +21,8 @@ import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Component
@@ -164,8 +167,12 @@ public class Bot extends TelegramLongPollingBot {
         telegramApiService.approveSong(songRequest);
     }
 
-    Long sendGeoLocationToServer(LocationDto locationDto) {
+    List sendGeoLocationToServer(LocationDto locationDto) {
         return telegramApiService.sendGeoLocation(locationDto);
+    }
+
+    List getAllCompany() {
+        return telegramApiService.getAllCompany();
     }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
