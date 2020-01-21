@@ -102,8 +102,18 @@ public class Bot extends TelegramLongPollingBot {
 
         if (state.name().equals("GeoLocation") & update.getMessage().getLocation() != null) {
             state.handleInput(context, new LocationDto(update.getMessage().getLocation().getLatitude(), update.getMessage().getLocation().getLongitude()));
+
+            telegramMessage.setStateId(state.ordinal());
+            telegramMessageService.updateTelegramUser(telegramMessage);
+            return;
         } else {
             state.handleInput(context);
+
+            if (state.name().equals("GeoLocation")) {
+                telegramMessage.setStateId(state.ordinal());
+                telegramMessageService.updateTelegramUser(telegramMessage);
+                return;
+            }
         }
 
         do {

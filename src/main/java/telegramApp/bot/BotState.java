@@ -6,7 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -57,12 +59,27 @@ public enum BotState {
         public void handleInput(BotContext context, LocationDto locationDto) {
             context.getBot().sendGeoLocationToServer(locationDto);
 
-            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
+
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
+            } catch (TelegramApiException e) {
+                e.getMessage();
+            }
+
+
+//            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
         @Override
         public void handleInput(BotContext context) {
-            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
+            } catch (TelegramApiException e) {
+                e.getMessage();
+            }
+
+
+//            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
         @Override
@@ -241,6 +258,7 @@ public enum BotState {
 
         keyboardButton1.setText("Отправить местоположение");
         keyboardButton2.setText("Показать список заведений");
+
         keyboardButton1.setRequestLocation(true);
 
         KeyboardRow keyboardButtonsRow = new KeyboardRow();
@@ -254,6 +272,36 @@ public enum BotState {
         keyboardMarkup.setKeyboard(rowList);
 
         SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Выберите ваш вариант:").setReplyMarkup(keyboardMarkup);
+
+        return sendMessage;
+    }
+
+    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
+        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
+
+        inlineKeyboardButton1.setText("Тык");
+        inlineKeyboardButton1.setSwitchInlineQuery("tlg");
+        inlineKeyboardButton1.setCallbackData("Button \"Тык\" has been pressed");
+
+        inlineKeyboardButton2.setText("Тык2");
+        inlineKeyboardButton2.setCallbackData("Button \"Тык2\" has been pressed");
+
+        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
+
+        keyboardButtonsRow1.add(inlineKeyboardButton1);
+
+        keyboardButtonsRow2.add(inlineKeyboardButton2);
+
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow1);
+        rowList.add(keyboardButtonsRow2);
+
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Список заведений:").setReplyMarkup(inlineKeyboardMarkup);
 
         return sendMessage;
     }
