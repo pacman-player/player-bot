@@ -3,16 +3,21 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
+import telegramApp.dto.CompanyDto;
+import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public enum BotState {
@@ -22,6 +27,49 @@ public enum BotState {
         public void enter(BotContext context) {
 
             sendMessage(context, "Привет");
+        }
+
+        @Override
+        public BotState nextState() {
+            return GeoLocation;
+        }
+    },
+
+    GeoLocation() {
+        private BotState next;
+
+        @Override
+        public void enter(BotContext context) {
+            sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение \n\nили \n\nвыберите заведение из списка");
+        }
+
+        @Override
+        public void handleInput(BotContext context, Update update) {
+            try {
+                context.getBot().execute(sendKeyBoardMessage(update.getMessage().getChatId()));
+            } catch (TelegramApiValidationException e) {
+                e.printStackTrace();
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void handleInput(BotContext context, LocationDto locationDto) {
+            HashMap company = context.getBot().sendGeoLocationToServer(locationDto);
+            if(company.isEmpty()){
+                sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
+            }
+            CompanyDto companyDto = new CompanyDto(1l, (Integer) company.get("1"), (String) company.get("2"));
+            context.getTelegramMessage().setCompanyId(Long.valueOf((companyDto.getCompanyId())));
+            System.out.println(context.getTelegramMessage().getCompanyId());
+            sendMessage(context, "Список заведений: \n" + companyDto.getName());
+        }
+
+        @Override
+        public void handleInput(BotContext context) {
+            context.getBot().getAllCompany();
+            sendMessage(context, "Список заведений: \n" + context.getBot().getAllCompany());
         }
 
         @Override
@@ -198,6 +246,30 @@ public enum BotState {
         this.inputNeeded = inputNeeded;
     }
 
+    public static SendMessage sendKeyBoardMessage(long chatId) throws TelegramApiValidationException {
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        KeyboardButton keyboardButton1 = new KeyboardButton();
+        KeyboardButton keyboardButton2 = new KeyboardButton();
+
+        keyboardButton1.setText("Отправить местоположение");
+        keyboardButton2.setText("Показать список заведений");
+        keyboardButton1.setRequestLocation(true);
+
+        KeyboardRow keyboardButtonsRow = new KeyboardRow();
+
+        keyboardButtonsRow.add(keyboardButton1);
+        keyboardButtonsRow.add(keyboardButton2);
+
+        List<KeyboardRow> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow);
+
+        keyboardMarkup.setKeyboard(rowList);
+
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Выберите ваш вариант:").setReplyMarkup(keyboardMarkup);
+
+        return sendMessage;
+    }
+
     public static BotState getInitialState() {
         return byId(0);
     }
@@ -264,6 +336,8 @@ public enum BotState {
     }
 
     public void handleInput(BotContext context) {}
+    public void handleInput(BotContext context, Update update) {}
+    public void handleInput(BotContext context, LocationDto locationDto) {}
 
     public abstract void enter(BotContext context);
 

@@ -25,6 +25,14 @@ public class TelegramMessage {
         this.stateId = stateId;
     }
 
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
+
     public int getStateId() {
         return stateId;
     }

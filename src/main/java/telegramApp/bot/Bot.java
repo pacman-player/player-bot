@@ -5,20 +5,22 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import telegramApp.dto.CompanyDto;
+import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 @PropertySource("classpath:telegram.properties")
@@ -50,6 +52,17 @@ public class Bot extends TelegramLongPollingBot {
 
         if (!update.hasMessage()) {
             paymentPreCheckout(update);
+
+            if(update.hasCallbackQuery()){
+                try {
+                    execute(new SendMessage().setText(
+                            update.getCallbackQuery().getData())
+                            .setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return;
         }
 
@@ -61,6 +74,10 @@ public class Bot extends TelegramLongPollingBot {
 
         final long chatId = update.getMessage().getChatId();
         TelegramMessage telegramMessage = telegramMessageService.findByChatId(chatId);
+
+        if (text.equals("/start")) {
+            telegramMessage = null;
+        }
 
         if (telegramMessage == null) {
             state = BotState.getInitialState();
@@ -83,10 +100,19 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
 
-        state.handleInput(context);
+        if (state.name().equals("GeoLocation") & update.getMessage().getLocation() != null) {
+            state.handleInput(context, new LocationDto(update.getMessage().getLocation().getLatitude(), update.getMessage().getLocation().getLongitude()));
+        } else {
+            state.handleInput(context);
+        }
+
         do {
             state = state.nextState();
             state.enter(context);
+
+            if (text.equals("/start")) {
+                state.handleInput(context, update);
+            }
         }
         while (!state.isInputNeeded());
 
@@ -140,6 +166,14 @@ public class Bot extends TelegramLongPollingBot {
 
     void addSongToQueue(TelegramMessage telegramMessage) {
         telegramApiService.addSongToQueue(1L, telegramMessage.getSongId());
+    }
+
+    HashMap sendGeoLocationToServer(LocationDto locationDto) {
+        return telegramApiService.sendGeoLocation(locationDto);
+    }
+
+    List getAllCompany() {
+        return telegramApiService.getAllCompany();
     }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
