@@ -59,7 +59,7 @@ public enum BotState {
             if(company.isEmpty()){
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
             }
-            companyId = Long.parseLong(company.get(0).toString());
+            context.getTelegramMessage().setCompanyId(Long.parseLong(company.get(0).toString()));
             sendMessage(context, "Список заведений: \n" + company.toString());
         }
 
@@ -228,7 +228,6 @@ public enum BotState {
     };
 
     private static BotState[] states;
-    public long companyId = 0;
     private final boolean inputNeeded;
 
     BotState() {
