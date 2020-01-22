@@ -138,6 +138,10 @@ public class Bot extends TelegramLongPollingBot {
         telegramApiService.approveSong(songRequest);
     }
 
+    void addSongToQueue(TelegramMessage telegramMessage) {
+        telegramApiService.addSongToQueue(1L, telegramMessage.getSongId());
+    }
+
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
         return telegramMessageService.findByChatId(chatId);
     }

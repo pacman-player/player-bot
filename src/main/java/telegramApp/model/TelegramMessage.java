@@ -15,6 +15,7 @@ public class TelegramMessage {
     private String performerName;
     private String songName;
     private Long songId;
+    private Long companyId;
 
     public TelegramMessage() {
     }
@@ -64,5 +65,11 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
+    public Long getCompanyId() {
+        return companyId;
+    }
 
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
 }
