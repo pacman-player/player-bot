@@ -165,7 +165,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     void addSongToQueue(TelegramMessage telegramMessage) {
-        telegramApiService.addSongToQueue(1L, telegramMessage.getSongId());
+        telegramApiService.addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
     }
 
     HashMap sendGeoLocationToServer(LocationDto locationDto) {

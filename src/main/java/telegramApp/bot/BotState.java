@@ -197,7 +197,6 @@ public enum BotState {
             SuccessfulPayment successfulPayment = context.getSuccessfulPayment();
             if (successfulPayment != null && successfulPayment.getInvoicePayload().startsWith("pacman-player")) {
                 sendMessage(context, "Спасибо за оплату");
-                //TODO
                 //DUPLICATE LINES
 //                TelegramMessage telegramMessage = context.getBot().getTelegramMessageFromDB(context.getTelegramMessage().getChatId());
 //                context.getBot().sendSongIdToServer(telegramMessage);
@@ -218,7 +217,6 @@ public enum BotState {
         @Override
         public void enter(BotContext context) {
             try {
-                //TODO
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
                 context.getBot().addSongToQueue(context.getTelegramMessage());

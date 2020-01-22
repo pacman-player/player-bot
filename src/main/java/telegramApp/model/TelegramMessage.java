@@ -73,11 +73,4 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
 }
