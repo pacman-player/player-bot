@@ -50,7 +50,7 @@ public class Bot extends TelegramLongPollingBot {
         BotState state;
         String text;
 
-        if (!update.hasMessage()) {
+        if (!update.hasMessage() & !update.hasCallbackQuery()) {
             paymentPreCheckout(update);
 
             if(update.hasCallbackQuery()){
@@ -66,13 +66,23 @@ public class Bot extends TelegramLongPollingBot {
             return;
         }
 
-        if (update.getMessage().hasText()) {
-            text = update.getMessage().getText();
+        if (update.hasMessage()) {
+            if (update.getMessage().hasText()) {
+                text = update.getMessage().getText();
+            } else {
+                text = "";
+            }
         } else {
             text = "";
         }
 
-        final long chatId = update.getMessage().getChatId();
+        long chatId = 0;
+        if (update.hasMessage()) {
+            chatId = update.getMessage().getChatId();
+        }
+        if (update.hasCallbackQuery()) {
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+        }
         TelegramMessage telegramMessage = telegramMessageService.findByChatId(chatId);
 
         if (text.equals("/start")) {
@@ -100,19 +110,21 @@ public class Bot extends TelegramLongPollingBot {
             }
         }
 
-        if (state.name().equals("GeoLocation") & update.getMessage().getLocation() != null) {
-            state.handleInput(context, new LocationDto(update.getMessage().getLocation().getLatitude(), update.getMessage().getLocation().getLongitude()));
+        if (update.hasMessage()) {
+            if (state.name().equals("GeoLocation") & update.getMessage().hasLocation()) {
+                state.handleInput(context, new LocationDto(update.getMessage().getLocation().getLatitude(), update.getMessage().getLocation().getLongitude()));
 
-            telegramMessage.setStateId(state.ordinal());
-            telegramMessageService.updateTelegramUser(telegramMessage);
-            return;
-        } else {
-            state.handleInput(context);
-
-            if (state.name().equals("GeoLocation")) {
                 telegramMessage.setStateId(state.ordinal());
                 telegramMessageService.updateTelegramUser(telegramMessage);
                 return;
+            } else {
+                state.handleInput(context);
+
+                if (state.name().equals("GeoLocation")) {
+                    telegramMessage.setStateId(state.ordinal());
+                    telegramMessageService.updateTelegramUser(telegramMessage);
+                    return;
+                }
             }
         }
 
