@@ -14,13 +14,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
+import telegramApp.dto.CompanyDto;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public enum BotState {
@@ -58,8 +58,16 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            context.getBot().sendGeoLocationToServer(locationDto);
+            HashMap company = context.getBot().sendGeoLocationToServer(locationDto);
 
+            if(company.isEmpty()){
+                sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
+            }
+
+            CompanyDto companyDto = new CompanyDto(1l, (Integer) company.get("1"), (String) company.get("2"));
+            context.getTelegramMessage().setCompanyId(Long.valueOf((companyDto.getCompanyId())));
+            System.out.println(context.getTelegramMessage().getCompanyId());
+            sendMessage(context, "Список заведений: \n" + companyDto.getName());
 
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
@@ -73,6 +81,10 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context) {
+            context.getBot().getAllCompany();
+            sendMessage(context, "Список заведений: \n" + context.getBot().getAllCompany());
+
+
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
             } catch (TelegramApiException e) {
