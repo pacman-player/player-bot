@@ -3,19 +3,17 @@ package telegramApp.dto;
 public class CompanyDto {
 
     private Long id;
+    private int companyId;
     private String name;
     private String startTime;
     private String closeTime;
     private Long orgType;
     private Long userId;
 
-    public CompanyDto(Long id, String name, String startTime, String closeTime, Long orgType, Long userId) {
+    public CompanyDto(Long id, int companyId, String name) {
         this.id = id;
+        this.companyId = companyId;
         this.name = name;
-        this.startTime = startTime;
-        this.closeTime = closeTime;
-        this.orgType = orgType;
-        this.userId = userId;
     }
 
     public Long getId() {
@@ -32,6 +30,14 @@ public class CompanyDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
     }
 
     public String getStartTime() {

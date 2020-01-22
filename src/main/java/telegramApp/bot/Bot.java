@@ -20,10 +20,7 @@ import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 @PropertySource("classpath:telegram.properties")
@@ -167,7 +164,7 @@ public class Bot extends TelegramLongPollingBot {
         telegramApiService.approveSong(songRequest);
     }
 
-    List sendGeoLocationToServer(LocationDto locationDto) {
+    HashMap sendGeoLocationToServer(LocationDto locationDto) {
         return telegramApiService.sendGeoLocation(locationDto);
     }
 

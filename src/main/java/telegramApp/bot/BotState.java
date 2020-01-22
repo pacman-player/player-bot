@@ -55,12 +55,14 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            List company = context.getBot().sendGeoLocationToServer(locationDto);
+            HashMap company = context.getBot().sendGeoLocationToServer(locationDto);
             if(company.isEmpty()){
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
             }
-            context.getTelegramMessage().setCompanyId(Long.parseLong(company.get(0).toString()));
-            sendMessage(context, "Список заведений: \n" + company.toString());
+            CompanyDto companyDto = new CompanyDto(1l, (Integer) company.get("1"), (String) company.get("2"));
+            context.getTelegramMessage().setCompanyId(Long.valueOf((companyDto.getCompanyId())));
+            System.out.println(context.getTelegramMessage().getCompanyId());
+            sendMessage(context, "Список заведений: \n" + companyDto.getName());
         }
 
         @Override

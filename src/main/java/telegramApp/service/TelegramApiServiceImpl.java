@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import telegramApp.dto.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,9 +33,9 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
-    public List sendGeoLocation(LocationDto locationDto) {
+    public HashMap sendGeoLocation(LocationDto locationDto) {
         String URL = serverPath + "/api/tlg/location";
-        return restTemplate.postForObject(URL, locationDto, List.class);
+        return restTemplate.postForObject(URL, locationDto, HashMap.class);
     }
 
     public List getAllCompany() {
