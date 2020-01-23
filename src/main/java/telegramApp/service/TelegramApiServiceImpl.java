@@ -7,12 +7,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.*;
+import telegramApp.dto.LocationDto;
+import telegramApp.dto.SongRequest;
+import telegramApp.dto.SongResponse;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 @Service
 @PropertySource("classpath:telegram.properties")

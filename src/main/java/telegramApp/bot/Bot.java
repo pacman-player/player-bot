@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.CompanyDto;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
@@ -20,7 +19,9 @@ import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 @PropertySource("classpath:telegram.properties")
