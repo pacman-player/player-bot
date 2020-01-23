@@ -60,66 +60,32 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            List company = context.getBot().sendGeoLocationToServer(locationDto);
+            List companies = context.getBot().sendGeoLocationToServer(locationDto);
 
-            if(company.isEmpty()){
+            if(companies.isEmpty()){
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
             }
 
-            StringBuilder str = new StringBuilder();
-            Long companyId = 1L;
-            int companyName = 2;
-//            while(!company.isEmpty()){
-//                String compId = String.valueOf(companyId);
-//                String compName = String.valueOf(companyName);
-//                CompanyDto companyDto = new CompanyDto((Integer) company.get(compId), (String) company.get(compName));
-//                str.append(companyDto.getName()).append("\n");
-//                company.remove(compId);
-//                company.remove(compName);
-//                companyId++;
-//                companyName = companyName + 2;
-//            }
-//            CompanyDto companyDto = new CompanyDto(1l, (Integer) company.get("1"), (String) company.get("2"));
-//            context.getTelegramMessage().setCompanyId(Long.valueOf((companyDto.getCompanyId())));
-            sendMessage(context, "Список заведений: \n" + str);
+            sendMessage(context, "Список заведений: \n");
 
             try {
-                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), context.getBot().getAllCompany()));
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
             } catch (TelegramApiException e) {
                 e.getMessage();
             }
-
-
-//            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
         @Override
         public void handleInput(BotContext context) {
-            List companys = context.getBot().getAllCompany();
-            StringBuilder str = new StringBuilder();
-            Long companyId = 1L;
-            int companyName = 2;
-//            while (!companys.isEmpty()){
-//                String compId = String.valueOf(companyId);
-//                String compName = String.valueOf(companyName);
-//                CompanyDto companyDto = new CompanyDto((Integer) companys.get(compId), (String) companys.get(compName));
-//                str.append(companyDto.getName());
-//                str.append("\n");
-//                companys.remove(compId);
-//                companys.remove(compName);
-//                companyId++;
-//                companyName = companyName + 2;
-//            }
-            sendMessage(context, "Список заведений: \n" + str);
+            List companies = context.getBot().getAllCompany();
+
+            sendMessage(context, "Список заведений: \n");
 
             try {
-                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companys));
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
             } catch (TelegramApiException e) {
                 e.getMessage();
             }
-
-
-//            sendMessage(context, "Список заведений: \n\n1...\n2...\n3...\n\n...");
         }
 
         @Override
