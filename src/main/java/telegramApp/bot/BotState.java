@@ -64,6 +64,15 @@ public enum BotState {
 
             if(companies.isEmpty()){
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
+                companies = context.getBot().getAllCompany();
+
+                try {
+                    context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
+                } catch (TelegramApiException e) {
+                    e.getMessage();
+                }
+
+                return;
             }
 
             sendMessage(context, "Список заведений: \n");
