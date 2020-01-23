@@ -60,7 +60,7 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
-            List companies = context.getBot().sendGeoLocationToServer(locationDto);
+            List<LinkedHashMap<String, String>> companies = context.getBot().sendGeoLocationToServer(locationDto);
 
             if(companies.isEmpty()){
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
@@ -75,8 +75,6 @@ public enum BotState {
                 return;
             }
 
-            sendMessage(context, "Список заведений: \n");
-
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
             } catch (TelegramApiException e) {
@@ -86,9 +84,7 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context) {
-            List companies = context.getBot().getAllCompany();
-
-            sendMessage(context, "Список заведений: \n");
+            List<LinkedHashMap<String, String>> companies = context.getBot().getAllCompany();
 
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
