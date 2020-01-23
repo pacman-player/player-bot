@@ -70,7 +70,7 @@ public enum BotState {
             sendMessage(context, "Список заведений: \n" + companyDto.getName());
 
             try {
-                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), context.getBot().getAllCompany()));
             } catch (TelegramApiException e) {
                 e.getMessage();
             }
@@ -82,11 +82,12 @@ public enum BotState {
         @Override
         public void handleInput(BotContext context) {
             context.getBot().getAllCompany();
-            sendMessage(context, "Список заведений: \n" + context.getBot().getAllCompany());
+            sendMessage(context, "Список заведений: \n");
 
+            List<LinkedHashMap<String, String>> listOfCompanies = (List<LinkedHashMap<String, String>>)context.getBot().getAllCompany();
 
             try {
-                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId()));
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), listOfCompanies));
             } catch (TelegramApiException e) {
                 e.getMessage();
             }
@@ -289,8 +290,10 @@ public enum BotState {
         return sendMessage;
     }
 
-    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId) {
+    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, Object listOfCompanies) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+
         InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
         InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
 
