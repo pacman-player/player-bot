@@ -187,11 +187,11 @@ public class Bot extends TelegramLongPollingBot {
         telegramApiService.approveSong(songRequest);
     }
 
-    HashMap sendGeoLocationToServer(LocationDto locationDto) {
+    List sendGeoLocationToServer(LocationDto locationDto) {
         return telegramApiService.sendGeoLocation(locationDto);
     }
 
-    HashMap getAllCompany() {
+    List getAllCompany() {
         return telegramApiService.getAllCompany();
     }
 
