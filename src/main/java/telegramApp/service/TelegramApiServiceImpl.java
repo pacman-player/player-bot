@@ -33,14 +33,14 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
-    public HashMap sendGeoLocation(LocationDto locationDto) {
+    public List sendGeoLocation(LocationDto locationDto) {
         String URL = serverPath + "/api/tlg/location";
-        return restTemplate.postForObject(URL, locationDto, HashMap.class);
+        return restTemplate.postForObject(URL, locationDto, List.class);
     }
 
-    public HashMap getAllCompany() {
+    public List getAllCompany() {
         String URL = serverPath + "/api/tlg/all_company";
-        return restTemplate.postForObject(URL, null, HashMap.class);
+        return restTemplate.postForObject(URL, null, List.class);
     }
 
     public SongResponse approveSong(SongRequest songRequest) {
