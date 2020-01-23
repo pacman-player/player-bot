@@ -38,9 +38,9 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         return restTemplate.postForObject(URL, locationDto, HashMap.class);
     }
 
-    public List getAllCompany() {
+    public HashMap getAllCompany() {
         String URL = serverPath + "/api/tlg/all_company";
-        return restTemplate.postForObject(URL, null, List.class);
+        return restTemplate.postForObject(URL, null, HashMap.class);
     }
 
     public SongResponse approveSong(SongRequest songRequest) {
