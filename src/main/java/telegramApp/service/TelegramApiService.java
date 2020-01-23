@@ -16,7 +16,7 @@ public interface TelegramApiService {
 
     HashMap sendGeoLocation(LocationDto locationDto);
 
-    List getAllCompany();
+    HashMap getAllCompany();
 
     void addSongToQueue(long songId, long companyId);
 

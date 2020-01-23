@@ -190,7 +190,7 @@ public class Bot extends TelegramLongPollingBot {
         return telegramApiService.sendGeoLocation(locationDto);
     }
 
-    List getAllCompany() {
+    HashMap getAllCompany() {
         return telegramApiService.getAllCompany();
     }
 
