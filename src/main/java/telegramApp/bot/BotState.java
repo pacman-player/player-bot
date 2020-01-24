@@ -287,29 +287,20 @@ public enum BotState {
         return sendMessage;
     }
 
-    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, Object listOfCompanies) {
+    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, List<LinkedHashMap<String, String>> listOfCompanies) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-
-        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
-        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
-
-        inlineKeyboardButton1.setText("Company_1");
-        inlineKeyboardButton1.setCallbackData("Button \"Company_1\" has been pressed");
-
-        inlineKeyboardButton2.setText("Company_2");
-        inlineKeyboardButton2.setCallbackData("Button \"Company_2\" has been pressed");
-
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
-
-        keyboardButtonsRow1.add(inlineKeyboardButton1);
-
-        keyboardButtonsRow2.add(inlineKeyboardButton2);
-
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-        rowList.add(keyboardButtonsRow1);
-        rowList.add(keyboardButtonsRow2);
+
+        for (int i = 0; i < listOfCompanies.size(); i++) {
+            InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+            inlineKeyboardButton.setText(listOfCompanies.get(i).get("name"));
+            inlineKeyboardButton.setCallbackData("Company choosed!");
+
+            List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+            keyboardButtonsRow.add(inlineKeyboardButton);
+
+            rowList.add(keyboardButtonsRow);
+        }
 
         inlineKeyboardMarkup.setKeyboard(rowList);
 
