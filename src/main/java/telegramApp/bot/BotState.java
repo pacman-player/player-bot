@@ -294,7 +294,7 @@ public enum BotState {
         for (int i = 0; i < listOfCompanies.size(); i++) {
             InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
             inlineKeyboardButton.setText(listOfCompanies.get(i).get("name"));
-            inlineKeyboardButton.setCallbackData("Company choosed!");
+            inlineKeyboardButton.setCallbackData(String.valueOf(listOfCompanies.get(i).get("id")));
 
             List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
             keyboardButtonsRow.add(inlineKeyboardButton);
