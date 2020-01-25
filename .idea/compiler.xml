@@ -6,19 +6,22 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="player-bot" />
         <module name="player-bot2" />
+        <module name="telegtamBot" />
+        <module name="player-bot" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="player-bot" target="1.8" />
       <module name="player-bot2" target="1.8" />
+      <module name="telegtamBot" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="player-bot" options="-parameters" />
       <module name="player-bot2" options="-parameters" />
+      <module name="telegtamBot" options="-parameters" />
     </option>
   </component>
 </project>

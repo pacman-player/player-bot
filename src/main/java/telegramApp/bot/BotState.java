@@ -67,6 +67,10 @@ public enum BotState {
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
+                String title = songResponse.getTrackName();
+                String[] performerAndSong = title.split(" – ");
+                telegramMessage.setPerformerName(performerAndSong[0]);
+                telegramMessage.setSongName(performerAndSong[1]);
                 context.getBot().saveTelegramMessage(telegramMessage);
                 sendTrack(context, songResponse);
             } catch (Exception ex) {
