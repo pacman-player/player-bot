@@ -38,21 +38,27 @@ public enum BotState {
     },
 
     GeoLocation() {
-        private BotState next;
-
         @Override
         public void enter(BotContext context) {
             sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение \n\nили \n\nвыберите заведение из списка");
-        }
 
-        @Override
-        public void handleInput(BotContext context, Update update) {
             try {
-                context.getBot().execute(sendKeyBoardMessage(update.getMessage().getChatId()));
+                context.getBot().execute(sendKeyBoardMessage(context.getTelegramMessage().getChatId()));
             } catch (TelegramApiValidationException e) {
                 e.printStackTrace();
             } catch (TelegramApiException e) {
                 e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void handleInput(BotContext context) {
+            List<LinkedHashMap<String, String>> companies = context.getBot().getAllCompany();
+
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
+            } catch (TelegramApiException e) {
+                e.getMessage();
             }
         }
 
@@ -72,17 +78,6 @@ public enum BotState {
 
                 return;
             }
-
-            try {
-                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
-            } catch (TelegramApiException e) {
-                e.getMessage();
-            }
-        }
-
-        @Override
-        public void handleInput(BotContext context) {
-            List<LinkedHashMap<String, String>> companies = context.getBot().getAllCompany();
 
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
