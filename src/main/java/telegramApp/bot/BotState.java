@@ -58,8 +58,8 @@ public enum BotState {
         public void handleInput(BotContext context, LocationDto locationDto) {
             List company = context.getBot().sendGeoLocationToServer(locationDto);
 
-            CompanyDto companyDto = new CompanyDto();
-            context.getTelegramMessage().setCompanyId( Long.valueOf(companyDto.getId()));
+
+            context.getTelegramMessage().setCompanyId( 1L);
             sendMessage(context, "Список заведений: \n" + company );
         }
 
