@@ -57,13 +57,15 @@ public enum BotState {
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) {
             List company = context.getBot().sendGeoLocationToServer(locationDto);
-            sendMessage(context, "Список заведений: \n" );
+            CompanyDto companyDto = (CompanyDto) company.get(0);
+            context.getTelegramMessage().setCompanyId( Long.valueOf(companyDto.getId()));
+            sendMessage(context, "Список заведений: \n" + company );
         }
 
         @Override
         public void handleInput(BotContext context) {
             List compans = context.getBot().getAllCompany();
-            sendMessage(context, "Список заведений: \n" );
+            sendMessage(context, "Список заведений: \n"+ compans );
         }
 
         @Override
