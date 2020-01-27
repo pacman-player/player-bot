@@ -168,6 +168,10 @@ public class Bot extends TelegramLongPollingBot {
         return telegramApiService.sendGeoLocation(locationDto);
     }
 
+    void addSongToQueue(TelegramMessage telegramMessage) {
+        telegramApiService.addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
+    }
+
     List getAllCompany() {
         return telegramApiService.getAllCompany();
     }

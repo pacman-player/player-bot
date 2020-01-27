@@ -73,5 +73,4 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
-
 }

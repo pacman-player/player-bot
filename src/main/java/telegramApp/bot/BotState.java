@@ -25,6 +25,7 @@ public enum BotState {
     Start(false) {
         @Override
         public void enter(BotContext context) {
+
             sendMessage(context, "Привет");
         }
 
@@ -147,8 +148,8 @@ public enum BotState {
         public void handleInput(BotContext context) {
             String text = context.getInput();
             if (text.equals("Да")) {
-                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
-                sendTrack(context, songResponse);
+//                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
+//                sendTrack(context, songResponse);
                 next = Payment;
             } else {
                 next = EnterPerformerName;
@@ -190,8 +191,9 @@ public enum BotState {
             SuccessfulPayment successfulPayment = context.getSuccessfulPayment();
             if (successfulPayment != null && successfulPayment.getInvoicePayload().startsWith("pacman-player")) {
                 sendMessage(context, "Спасибо за оплату");
-                TelegramMessage telegramMessage = context.getBot().getTelegramMessageFromDB(context.getTelegramMessage().getChatId());
-                context.getBot().sendSongIdToServer(telegramMessage);
+                //DUPLICATE LINES
+//                TelegramMessage telegramMessage = context.getBot().getTelegramMessageFromDB(context.getTelegramMessage().getChatId());
+//                context.getBot().sendSongIdToServer(telegramMessage);
                 next = Approved;
             } else {
                 sendMessage(context, "Оплата не прошла, попробуйте снова");
@@ -209,7 +211,9 @@ public enum BotState {
         @Override
         public void enter(BotContext context) {
             try {
-                context.getBot().sendSongIdToServer(context.getTelegramMessage());
+                //DUPLICATE LINES
+//                context.getBot().sendSongIdToServer(context.getTelegramMessage());
+                context.getBot().addSongToQueue(context.getTelegramMessage());
                 sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
             } catch (Exception ex) {
                 ex.printStackTrace();
