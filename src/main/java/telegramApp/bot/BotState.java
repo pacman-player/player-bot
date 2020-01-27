@@ -6,7 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,7 +19,9 @@ import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Component
 public enum BotState {
@@ -36,11 +40,16 @@ public enum BotState {
     },
 
     GeoLocation() {
-        private BotState next;
-
         @Override
         public void enter(BotContext context) {
             sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение \n\nили \n\nвыберите заведение из списка");
+            try {
+                context.getBot().execute(sendKeyBoardMessage(context.getTelegramMessage().getChatId()));
+            } catch (TelegramApiValidationException e) {
+                e.printStackTrace();
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -55,18 +64,38 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context, LocationDto locationDto) {
-            List company = context.getBot().sendGeoLocationToServer(locationDto);
+        public void handleInput(BotContext context) {
+            List<LinkedHashMap<String, String>> companies = context.getBot().getAllCompany();
 
-
-            context.getTelegramMessage().setCompanyId( 1L);
-            sendMessage(context, "Список заведений: \n" + company );
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
+            } catch (TelegramApiException e) {
+                e.getMessage();
+            }
         }
 
         @Override
-        public void handleInput(BotContext context) {
-            List compans = context.getBot().getAllCompany();
-            sendMessage(context, "Список заведений: \n"+ compans );
+        public void handleInput(BotContext context, LocationDto locationDto) {
+            List<LinkedHashMap<String, String>> companies = context.getBot().sendGeoLocationToServer(locationDto);
+
+            if(companies.isEmpty()){
+                sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
+                companies = context.getBot().getAllCompany();
+
+                try {
+                    context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
+                } catch (TelegramApiException e) {
+                    e.getMessage();
+                }
+
+                return;
+            }
+
+            try {
+                context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
+            } catch (TelegramApiException e) {
+                e.getMessage();
+            }
         }
 
         @Override
@@ -261,6 +290,28 @@ public enum BotState {
         keyboardMarkup.setKeyboard(rowList);
 
         SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Выберите ваш вариант:").setReplyMarkup(keyboardMarkup);
+
+        return sendMessage;
+    }
+
+    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, List<LinkedHashMap<String, String>> listOfCompanies) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+
+        for (int i = 0; i < listOfCompanies.size(); i++) {
+            InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+            inlineKeyboardButton.setText(listOfCompanies.get(i).get("name"));
+            inlineKeyboardButton.setCallbackData(String.valueOf(listOfCompanies.get(i).get("id")));
+
+            List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+            keyboardButtonsRow.add(inlineKeyboardButton);
+
+            rowList.add(keyboardButtonsRow);
+        }
+
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText("Список заведений:").setReplyMarkup(inlineKeyboardMarkup);
 
         return sendMessage;
     }
