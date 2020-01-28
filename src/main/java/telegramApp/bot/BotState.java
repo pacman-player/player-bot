@@ -368,7 +368,6 @@ public enum BotState {
     }
 
     public void handleInput(BotContext context) {}
-    public void handleInput(BotContext context, Update update) {}
     public void handleInput(BotContext context, LocationDto locationDto) {}
 
     public abstract void enter(BotContext context);
