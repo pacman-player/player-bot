@@ -60,17 +60,21 @@ public enum BotState {
             next = ApproveSong;
             context.getTelegramMessage().setSongName(context.getInput());
             sendMessage(context, "Песня загружается...");
-            sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
+            sendAnimation(context, "https://i.gifer.com/745t.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
+                //Изменяет отображение песни если соответствует условию
                 String title = songResponse.getTrackName();
-                String[] performerAndSong = title.split(" – ");
-                telegramMessage.setPerformerName(performerAndSong[0]);
-                telegramMessage.setSongName(performerAndSong[1]);
+                if(title.contains(" - ")) {
+                    String[] performerAndSong = title.split(" – ");
+                    telegramMessage.setPerformerName(performerAndSong[0]); // заменяет имя артиста
+                    telegramMessage.setSongName(performerAndSong[1]); //заменяет название песни
+                }
+
                 context.getBot().saveTelegramMessage(telegramMessage);
                 sendTrack(context, songResponse);
             } catch (Exception ex) {
