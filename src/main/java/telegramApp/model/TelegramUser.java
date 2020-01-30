@@ -7,37 +7,16 @@ import javax.persistence.Transient;
 import java.io.File;
 
 @Entity
-public class TelegramMessage {
+public class TelegramUser {
 
     @Id
     private Long chatId;
-    private int stateId;
-    private String performerName;
     private String songName;
     private Long songId;
+    @Transient
+    private File track;
 
-    public TelegramMessage() {
-    }
-
-    public TelegramMessage(Long chatId, int stateId) {
-        this.chatId = chatId;
-        this.stateId = stateId;
-    }
-
-    public int getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(int stateId) {
-        this.stateId = stateId;
-    }
-
-    public String getPerformerName() {
-        return performerName;
-    }
-
-    public void setPerformerName(String performerName) {
-        this.performerName = performerName;
+    public TelegramUser() {
     }
 
     public Long getChatId() {
@@ -64,5 +43,12 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
+    public File getTrack() {
+        return track;
+    }
+
+    public void setTrack(File track) {
+        this.track = track;
+    }
 
 }

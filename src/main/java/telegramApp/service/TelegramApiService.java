@@ -1,13 +1,27 @@
 package telegramApp.service;
 
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import telegramApp.model.TelegramUser;
 
-public interface TelegramApiService {
+@Service
+public class TelegramApiService {
+    private RestTemplate restTemplate;
 
-    SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
+    public TelegramApiService(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder
+                .build();
+    }
 
-    void addSongToQueue(long songId, long companyId);
+    public TelegramUser sendSong(TelegramUser telegramUser) {
+        String URL = "http://localhost:8080/api/tlg/song";
+        return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
+    }
 
-    SongResponse approveSong(SongRequest telegramMessage) ;
+    public TelegramUser approveSong(TelegramUser telegramUser) {
+        String URL = "http://localhost:8080/api/tlg/approve";
+        return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
+    }
+
 }
