@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.github.xabgesagtx:telegram-spring-boot-starter:0.20">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/xabgesagtx/telegram-spring-boot-starter/0.20/telegram-spring-boot-starter-0.20.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/xabgesagtx/telegram-spring-boot-starter/0.20/telegram-spring-boot-starter-0.20-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/xabgesagtx/telegram-spring-boot-starter/0.20/telegram-spring-boot-starter-0.20-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

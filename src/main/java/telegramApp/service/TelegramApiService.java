@@ -1,27 +1,24 @@
 package telegramApp.service;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import telegramApp.model.TelegramUser;
+import telegramApp.dto.CompanyDto;
+import telegramApp.dto.LocationDto;
+import telegramApp.dto.SongRequest;
+import telegramApp.dto.SongResponse;
 
-@Service
-public class TelegramApiService {
-    private RestTemplate restTemplate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-    public TelegramApiService(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder
-                .build();
-    }
+public interface TelegramApiService {
 
-    public TelegramUser sendSong(TelegramUser telegramUser) {
-        String URL = "http://localhost:8080/api/tlg/song";
-        return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
-    }
+    SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
 
-    public TelegramUser approveSong(TelegramUser telegramUser) {
-        String URL = "http://localhost:8080/api/tlg/approve";
-        return restTemplate.postForObject(URL, telegramUser, TelegramUser.class);
-    }
+    List sendGeoLocation(LocationDto locationDto);
 
+    List getAllCompany();
+
+    void addSongToQueue(long songId, long companyId);
+
+    SongResponse approveSong(SongRequest telegramMessage);
 }
