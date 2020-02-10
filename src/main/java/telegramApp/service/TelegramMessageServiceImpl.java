@@ -31,4 +31,9 @@ public class TelegramMessageServiceImpl implements TelegramMessageService {
     public void updateTelegramUser(TelegramMessage telegramMessage) {
         telegramMessageRepo.save(telegramMessage);
     }
+
+//    @Transactional
+//    public void setPosition(TelegramMessage telegramMessage) {
+//        telegramMessageRepo.save(telegramMessage);
+//    }
 }

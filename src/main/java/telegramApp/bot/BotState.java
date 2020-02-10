@@ -3,6 +3,7 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
+import sun.nio.cs.ext.MacCentralEurope;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
@@ -138,9 +140,13 @@ public enum BotState {
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
-//                SongResponse songResponseIsExist = context.getBot().getSongById(songResponse.)
-                if (songResponse.getInQueue() == true) {
-                    sendMessage(context, "Эта песня уже есть в очереди!!!!!");
+
+                //в контекст передаем позицию песни в очереди
+                context.getTelegramMessage().setPositionInQueue(songResponse.getPosition());
+
+                //если песня в очереди (можно определять только по позиции, без boolean)
+                if (songResponse.getInQueue()) {
+                    sendMessage(context, "Эта песня уже есть в плейлисте...");
                 }
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
@@ -162,7 +168,7 @@ public enum BotState {
 
     //Юзер получил звуковой файл для того чтобы уточнить нужная ли это песня.
     //Юзер должен нажать "да" если это та песня.
-    ApproveSong() {
+    ApproveSong {
         private BotState next;
 
         @Override
@@ -185,7 +191,24 @@ public enum BotState {
             if (text.equals("Да")) {
 //                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
 //                sendTrack(context, songResponse);
-                next = Payment;
+
+                //получаю из контекста позицию песни
+                Long position = context.getTelegramMessage().getPositionInQueue();
+                if (position == 0) {
+                    next = Payment;
+                } else {
+                    if (position < 11) {
+                        sendMessage(context, "Эта песня уже близко =)");
+                        sendMessage(context, "Она " + position + " в плейлисте!");
+                    }
+                    if (position > 10) {
+                        sendMessage(context, "Придется немного подождать...");
+                        sendMessage(context, "Песня " + position + " в плейлисте!");
+                    }
+
+                    next = EnterPerformerName;
+                }
+
             } else {
                 next = EnterPerformerName;
             }

@@ -11,6 +11,7 @@ public class BotContext {
     private final String input;
     private SuccessfulPayment successfulPayment;
     private Update update;
+//    private Long position;
 
     public BotContext(Bot bot, TelegramMessage telegramMessage, String input) {
         this.bot = bot;
@@ -55,4 +56,12 @@ public class BotContext {
     public void setUpdate(Update update) {
         this.update = update;
     }
+
+//    public Long getPosition() {
+//        return position;
+//    }
+//
+//    public void setPosition(Long position) {
+//        this.position = position;
+//    }
 }

@@ -16,6 +16,7 @@ public class TelegramMessage {
     private String songName;
     private Long songId;
     private Long companyId;
+    private Long positionInQueue;
 
     public TelegramMessage() {
     }
@@ -73,4 +74,11 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
+    public Long getPositionInQueue() {
+        return positionInQueue;
+    }
+
+    public void setPositionInQueue(Long positionInQueue) {
+        this.positionInQueue = positionInQueue;
+    }
 }
