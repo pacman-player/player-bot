@@ -6,8 +6,17 @@ public class SongResponse {
     private Long songId;
     private byte[] track;
     private String trackName;
+    private Boolean inQueue;
 
     public SongResponse() {
+    }
+
+    public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Boolean inQueue) {
+        this.chatId = chatId;
+        this.songId = songId;
+        this.track = track;
+        this.trackName = trackName;
+        this.inQueue = inQueue;
     }
 
     public SongResponse(Long chatId, Long songId, byte[] track, String trackName) {
@@ -47,5 +56,13 @@ public class SongResponse {
 
     public void setTrackName(String trackName) {
         this.trackName = trackName;
+    }
+
+    public Boolean getInQueue() {
+        return inQueue;
+    }
+
+    public void setInQueue(Boolean inQueue) {
+        this.inQueue = inQueue;
     }
 }
