@@ -138,8 +138,9 @@ public enum BotState {
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
+//                SongResponse songResponseIsExist = context.getBot().getSongById(songResponse.)
                 if (songResponse.getInQueue() == true) {
-
+                    sendMessage(context, "Эта песня уже есть в очереди!!!!!");
                 }
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
