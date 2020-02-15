@@ -7,6 +7,15 @@ public class SongRequest {
     private String authorName;
     private String songName;
     private Long songId;
+    private Long companyId;
+
+    public SongRequest(Long chatId, String authorName, String songName, Long songId, Long companyId) {
+        this.chatId = chatId;
+        this.authorName = authorName;
+        this.songName = songName;
+        this.songId = songId;
+        this.companyId = companyId;
+    }
 
     public SongRequest(TelegramMessage telegramMessage) {
         this.chatId = telegramMessage.getChatId();
@@ -51,5 +60,13 @@ public class SongRequest {
 
     public void setSongName(String songName) {
         this.songName = songName;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 }

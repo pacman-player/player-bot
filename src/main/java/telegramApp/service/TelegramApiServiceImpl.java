@@ -42,11 +42,23 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         return restTemplate.postForObject(URL, null, List.class);
     }
 
+    /**
+     * Метод передает на сервер pacman-player-core инфу о песне которую нужно найти. На сервере песня если
+     * скачивается с одного из сервисов по поиску музыки - сохраняется в папку music/ и возвращается в бота с инфой
+     * о том какой id у песни на сервере, с 30сек отрезком и полным названием трека.
+     * @param songRequest
+     * @return
+     */
     public SongResponse approveSong(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/approve";
         return restTemplate.postForObject(URL, songRequest, SongResponse.class);
     }
 
+    /**
+     * Метод добавляющий утвержденную песню в очередь SongQueue на сервере pacman-player-core после ее оплаты.
+     * @param songId
+     * @param companyId
+     */
     public void addSongToQueue(long songId, long companyId) {
         String URL = serverPath + "/api/tlg/addSongToQueue";
         HttpHeaders headers = new HttpHeaders();
