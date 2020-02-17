@@ -9,12 +9,11 @@ public class SongRequest {
     private Long songId;
     private Long companyId;
 
-    public SongRequest(Long chatId, String authorName, String songName, Long songId, Long companyId) {
+    public SongRequest(Long chatId, String authorName, String songName, Long songId) {
         this.chatId = chatId;
         this.authorName = authorName;
         this.songName = songName;
         this.songId = songId;
-        this.companyId = companyId;
     }
 
     public SongRequest(TelegramMessage telegramMessage) {
@@ -22,6 +21,7 @@ public class SongRequest {
         this.authorName = telegramMessage.getPerformerName();
         this.songName = telegramMessage.getSongName();
         this.songId = telegramMessage.getSongId();
+        this.companyId = telegramMessage.getCompanyId();
     }
 
     public SongRequest(Long chatId, String authorName, String songName) {

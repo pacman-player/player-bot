@@ -141,13 +141,14 @@ public enum BotState {
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
 
-                //в контекст передаем позицию песни в очереди
-//                context.getTelegramMessage().setPositionInQueue(songResponse.getPositionInQueue());
-//
-//                //если песня в очереди (можно определять только по позиции, без boolean)
-//                if (songResponse.getPositionInQueue() != 0) {
-//                    sendMessage(context, "Эта песня уже есть в плейлисте...");
-//                }
+                //в контекст передаем позицию искомой песни в очереди song_queue
+                context.getTelegramMessage().setPositionInQueue(songResponse.getPositionInQueue());
+
+                //если песня в очереди
+                if (songResponse.getPositionInQueue() != 0) {
+                    sendMessage(context, "Эта песня уже есть в плейлисте...");
+                }
+
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
@@ -192,22 +193,22 @@ public enum BotState {
 //                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
 //                sendTrack(context, songResponse);
 
-                //получаю из контекста позицию песни
-//                Long position = context.getTelegramMessage().getPositionInQueue();
-//                if (position == 0) {
+                //получаю из контекста позицию искомой песни в song_queue
+                Long position = context.getTelegramMessage().getPositionInQueue();
+                if (position == 0) {
                     next = Payment;
-//                } else {
-//                    if (position < 11) {
-//                        sendMessage(context, "Эта песня уже близко =)");
-//                        sendMessage(context, "Она " + position + " в плейлисте!");
-//                    }
-//                    if (position > 10) {
-//                        sendMessage(context, "Придется немного подождать...");
-//                        sendMessage(context, "Песня " + position + " в плейлисте!");
-//                    }
-//
-//                    next = EnterPerformerName;
-//                }
+                } else {
+                    if (position < 11) {
+                        sendMessage(context, "Эта песня уже близко =)");
+                        sendMessage(context, "Она " + position + " в плейлисте!");
+                    }
+                    if (position > 10) {
+                        sendMessage(context, "Придется немного подождать...");
+                        sendMessage(context, "Эта песня " + position + " в плейлисте!");
+                    }
+
+                    next = EnterPerformerName;
+                }
 
             } else {
                 next = EnterPerformerName;
