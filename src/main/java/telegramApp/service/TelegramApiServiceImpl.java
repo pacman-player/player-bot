@@ -67,5 +67,4 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         HttpEntity httpEntity = new HttpEntity(headers);
         restTemplate.postForObject(URL, httpEntity, Void.class);
     }
-
 }
