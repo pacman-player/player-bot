@@ -3,7 +3,6 @@ package telegramApp.bot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
@@ -14,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
-import sun.nio.cs.ext.MacCentralEurope;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
@@ -142,10 +140,10 @@ public enum BotState {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
 
                 //в контекст передаем позицию искомой песни в очереди song_queue
-                context.getTelegramMessage().setPositionInQueue(songResponse.getPositionInQueue());
+                context.getTelegramMessage().setPosition(songResponse.getPosition());
 
                 //если песня в очереди
-                if (songResponse.getPositionInQueue() != 0) {
+                if (songResponse.getPosition() != 0) {
                     sendMessage(context, "Эта песня уже есть в плейлисте...");
                 }
 
@@ -194,7 +192,7 @@ public enum BotState {
 //                sendTrack(context, songResponse);
 
                 //получаю из контекста позицию искомой песни в song_queue
-                Long position = context.getTelegramMessage().getPositionInQueue();
+                Long position = context.getTelegramMessage().getPosition();
                 if (position == 0) {
                     next = Payment;
                 } else {

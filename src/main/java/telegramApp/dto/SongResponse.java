@@ -6,17 +6,17 @@ public class SongResponse {
     private Long songId;
     private byte[] track;
     private String trackName;
-    private Long positionInQueue;
+    private Long position;
 
     public SongResponse() {
     }
 
-    public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Long positionInQueue) {
+    public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Long position) {
         this.chatId = chatId;
         this.songId = songId;
         this.track = track;
         this.trackName = trackName;
-        this.positionInQueue = positionInQueue;
+        this.position = position;
     }
 
     public Long getChatId() {
@@ -51,11 +51,11 @@ public class SongResponse {
         this.trackName = trackName;
     }
 
-    public Long getPositionInQueue() {
-        return positionInQueue;
+    public Long getPosition() {
+        return position;
     }
 
-    public void setPositionInQueue(Long positionInQueue) {
-        this.positionInQueue = positionInQueue;
+    public void setPosition(Long position) {
+        this.position = position;
     }
 }
