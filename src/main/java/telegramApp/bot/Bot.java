@@ -118,7 +118,7 @@ public class Bot extends TelegramLongPollingBot {
 
             context = new BotContext(this, telegramMessage, text);
 
-            telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData()));
+            telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
             do {
                 state = state.nextState();
                 state.enter(context);

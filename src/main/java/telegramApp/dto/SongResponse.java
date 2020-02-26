@@ -6,15 +6,17 @@ public class SongResponse {
     private Long songId;
     private byte[] track;
     private String trackName;
+    private Long position;
 
     public SongResponse() {
     }
 
-    public SongResponse(Long chatId, Long songId, byte[] track, String trackName) {
+    public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Long position) {
         this.chatId = chatId;
         this.songId = songId;
         this.track = track;
         this.trackName = trackName;
+        this.position = position;
     }
 
     public Long getChatId() {
@@ -47,5 +49,13 @@ public class SongResponse {
 
     public void setTrackName(String trackName) {
         this.trackName = trackName;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
     }
 }

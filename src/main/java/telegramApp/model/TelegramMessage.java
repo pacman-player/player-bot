@@ -3,8 +3,6 @@ package telegramApp.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Transient;
-import java.io.File;
 
 @Entity
 public class TelegramMessage {
@@ -16,6 +14,7 @@ public class TelegramMessage {
     private String songName;
     private Long songId;
     private Long companyId;
+    private Long position;
 
     public TelegramMessage() {
     }
@@ -73,4 +72,11 @@ public class TelegramMessage {
         this.songId = songId;
     }
 
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
 }

@@ -13,4 +13,6 @@ public interface TelegramMessageService {
     void addTelegramUser(TelegramMessage telegramMessage);
 
     void updateTelegramUser(TelegramMessage telegramMessage);
+
+//    void setPositionInQueue(Long position);
 }

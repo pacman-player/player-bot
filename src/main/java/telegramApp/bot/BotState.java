@@ -138,6 +138,15 @@ public enum BotState {
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
+
+                //в контекст передаем позицию искомой песни в очереди song_queue
+                context.getTelegramMessage().setPosition(songResponse.getPosition());
+
+                //если песня в очереди
+                if (songResponse.getPosition() != 0) {
+                    sendMessage(context, "Эта песня уже есть в плейлисте...");
+                }
+
                 Long songId = songResponse.getSongId();
                 TelegramMessage telegramMessage = context.getTelegramMessage();
                 telegramMessage.setSongId(songId);
@@ -158,7 +167,7 @@ public enum BotState {
 
     //Юзер получил звуковой файл для того чтобы уточнить нужная ли это песня.
     //Юзер должен нажать "да" если это та песня.
-    ApproveSong() {
+    ApproveSong {
         private BotState next;
 
         @Override
@@ -181,7 +190,24 @@ public enum BotState {
             if (text.equals("Да")) {
 //                SongResponse songResponse = context.getBot().sendToServer(context.getTelegramMessage());
 //                sendTrack(context, songResponse);
-                next = Payment;
+
+                //получаю из контекста позицию искомой песни в song_queue
+                Long position = context.getTelegramMessage().getPosition();
+                if (position == 0) {
+                    next = Payment;
+                } else {
+                    if (position < 11) {
+                        sendMessage(context, "Эта песня уже близко =)");
+                        sendMessage(context, "Она " + position + " в плейлисте!");
+                    }
+                    if (position > 10) {
+                        sendMessage(context, "Придется немного подождать...");
+                        sendMessage(context, "Эта песня " + position + " в плейлисте!");
+                    }
+
+                    next = EnterPerformerName;
+                }
+
             } else {
                 next = EnterPerformerName;
             }
