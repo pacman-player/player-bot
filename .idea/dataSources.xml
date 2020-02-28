@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@localhost" uuid="2044ee4e-efe1-40b5-9e57-e5b58b8ecf74">
+    <data-source source="LOCAL" name="tlg_bot@localhost" uuid="2044ee4e-efe1-40b5-9e57-e5b58b8ecf74">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306</jdbc-url>
-      <driver-properties>
-        <property name="autoReconnect" value="true" />
-        <property name="zeroDateTimeBehavior" value="CONVERT_TO_NULL" />
-        <property name="tinyInt1isBit" value="false" />
-        <property name="characterEncoding" value="utf8" />
-        <property name="characterSetResults" value="utf8" />
-        <property name="yearIsDateType" value="false" />
-      </driver-properties>
+      <jdbc-url>jdbc:mysql://localhost:3306/tlg_bot?serverTimezone=Europe/Moscow&amp;verifyServerCertificate=false&amp;useSSL=true&amp;useUnicode=true&amp;characterEncoding=utf8</jdbc-url>
     </data-source>
   </component>
 </project>
