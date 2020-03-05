@@ -5,8 +5,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
+import telegramApp.dto.TelegramUser;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
@@ -67,7 +68,7 @@ public class Bot extends TelegramLongPollingBot {
                 telegramMessage = new TelegramMessage(chatId, state.ordinal());
                 telegramMessageService.addTelegramUser(telegramMessage);
 
-                context = new BotContext(this, telegramMessage, text);
+                context = new BotContext(this, telegramMessage, text, update);
                 state.enter(context);
             } else {
                 if (text.equals("/start")) {
@@ -130,6 +131,20 @@ public class Bot extends TelegramLongPollingBot {
         } else if (update.hasPreCheckoutQuery()) {
             paymentPreCheckout(update);
             return;
+        }
+    }
+
+    /**
+     * Метод проверяет, зарегистрирован ли в нашей базе данных на сервере pacman-player-core
+     * этот пользователь Telegram, и, если нет, то сохраняем его.
+     * @param user
+     */
+    void addTelegramUserIfDoesNotExist(User user) {
+        Long telegramUserId = new Long(user.getId());
+        boolean isTelegramUserExists = telegramApiService.isTelegramUserExists(telegramUserId);
+        if (!isTelegramUserExists) {
+            TelegramUser telegramUser = new TelegramUser(user);
+            telegramApiService.addTelegramUser(telegramUser);
         }
     }
 

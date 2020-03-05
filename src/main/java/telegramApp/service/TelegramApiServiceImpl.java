@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import telegramApp.dto.LocationDto;
 import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
+import telegramApp.dto.TelegramUser;
 
 import java.util.List;
 
@@ -66,5 +67,18 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         headers.add("companyId", String.valueOf(companyId));
         HttpEntity httpEntity = new HttpEntity(headers);
         restTemplate.postForObject(URL, httpEntity, Void.class);
+    }
+
+    @Override
+    public boolean isTelegramUserExists(Long telegramUserId) {
+        String URL = serverPath + "/api/tlg/isTelegramUserExists";
+        boolean isExists = Boolean.parseBoolean(restTemplate.postForObject(URL, telegramUserId, String.class));
+        return isExists;
+    }
+
+    @Override
+    public void addTelegramUser(TelegramUser telegramUser) {
+        String URL = serverPath + "/api/tlg/addTelegramUser";
+        restTemplate.postForObject(URL, telegramUser, Void.class);
     }
 }
