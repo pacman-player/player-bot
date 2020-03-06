@@ -1,9 +1,6 @@
 package telegramApp.service;
 
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
-import telegramApp.dto.TelegramUser;
+import telegramApp.dto.*;
 
 import java.util.List;
 
@@ -22,4 +19,6 @@ public interface TelegramApiService {
     boolean isTelegramUserExists(Long telegramUserId);
 
     void addTelegramUser(TelegramUser telegramUser);
+
+    void registerTelegramUserCompanyVisit(TelegramUserCompanyIdDto telegramUserCompanyIdDto);
 }

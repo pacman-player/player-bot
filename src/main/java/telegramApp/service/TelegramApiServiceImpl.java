@@ -7,10 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
-import telegramApp.dto.TelegramUser;
+import telegramApp.dto.*;
 
 import java.util.List;
 
@@ -80,5 +77,11 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     public void addTelegramUser(TelegramUser telegramUser) {
         String URL = serverPath + "/api/tlg/addTelegramUser";
         restTemplate.postForObject(URL, telegramUser, Void.class);
+    }
+
+    @Override
+    public void registerTelegramUserCompanyVisit(TelegramUserCompanyIdDto telegramUserCompanyIdDto) {
+        String URL = serverPath + "/api/tlg/registerVisit";
+        restTemplate.postForObject(URL, telegramUserCompanyIdDto, Void.class);
     }
 }

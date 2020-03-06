@@ -29,8 +29,6 @@ public enum BotState {
         @Override
         public void enter(BotContext context) {
             sendMessage(context, "Привет");
-            context.getBot()
-                    .addTelegramUserIfDoesNotExist(context.getUpdate().getMessage().getFrom());
         }
 
         @Override

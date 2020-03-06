@@ -5,6 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
@@ -12,10 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
-import telegramApp.dto.TelegramUser;
+import telegramApp.dto.*;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
@@ -67,6 +65,8 @@ public class Bot extends TelegramLongPollingBot {
                 state = BotState.getInitialState();
                 telegramMessage = new TelegramMessage(chatId, state.ordinal());
                 telegramMessageService.addTelegramUser(telegramMessage);
+
+                addTelegramUserIfDoesNotExist(update.getMessage().getFrom());
 
                 context = new BotContext(this, telegramMessage, text, update);
                 state.enter(context);
@@ -120,6 +120,8 @@ public class Bot extends TelegramLongPollingBot {
             context = new BotContext(this, telegramMessage, text);
 
             telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
+
+            registerTelegramUserCompanyVisit(update.getCallbackQuery());
             do {
                 state = state.nextState();
                 state.enter(context);
@@ -132,6 +134,18 @@ public class Bot extends TelegramLongPollingBot {
             paymentPreCheckout(update);
             return;
         }
+    }
+
+    /**
+     * Метод регистрирует в нашей базе данных на сервере pacman-player-core
+     * факт посещения этим пользователем Telegram выбранного заведения
+     * @param callbackQuery
+     */
+    private void registerTelegramUserCompanyVisit(CallbackQuery callbackQuery) {
+        TelegramUser telegramUser = new TelegramUser(callbackQuery.getFrom());
+        Long companyId = Long.parseLong(callbackQuery.getData());
+        TelegramUserCompanyIdDto telegramUserCompanyIdDto = new TelegramUserCompanyIdDto(telegramUser, companyId);
+        telegramApiService.registerTelegramUserCompanyVisit(telegramUserCompanyIdDto);
     }
 
     /**
