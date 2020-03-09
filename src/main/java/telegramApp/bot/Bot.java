@@ -125,7 +125,7 @@ public class Bot extends TelegramLongPollingBot {
             // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения
             // telegramMessage.setClient(true), то регистрируем его и факт посещения этого заведения в БД
             if (telegramMessage.isTelegramUserOurClient() && "GeoLocation".equals(state.name())) {
-                registerUserAndVisit(context.getTelegramMessage());
+                registerTelegramUserAndVisit(context.getTelegramMessage());
             }
 
             do {
@@ -146,11 +146,11 @@ public class Bot extends TelegramLongPollingBot {
      * пользователя Telegram и факт посещения этим пользователем заведения
      * @param telegramMessage
      */
-    void registerUserAndVisit(TelegramMessage telegramMessage) {
+    void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
         TelegramUserDto telegramUserDto = new TelegramUserDto(telegramMessage);
         Long companyId = telegramMessage.getCompanyId();
         VisitDto visitDto = new VisitDto(telegramUserDto, companyId);
-        telegramApiService.registerUserAndVisit(visitDto);
+        telegramApiService.registerTelegramUserAndVisit(visitDto);
     }
 
     private void paymentPreCheckout(Update update) {

@@ -16,5 +16,5 @@ public interface TelegramApiService {
 
     SongResponse approveSong(SongRequest telegramMessage);
 
-    void registerUserAndVisit(VisitDto visitDto);
+    void registerTelegramUserAndVisit(VisitDto visitDto);
 }

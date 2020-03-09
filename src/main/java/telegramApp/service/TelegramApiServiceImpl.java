@@ -72,7 +72,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * @param visitDto
      */
     @Override
-    public void registerUserAndVisit(VisitDto visitDto) {
+    public void registerTelegramUserAndVisit(VisitDto visitDto) {
         String URL = serverPath + "/api/tlg/registerTelegramUserAndVisit";
         restTemplate.postForObject(URL, visitDto, Void.class);
     }
