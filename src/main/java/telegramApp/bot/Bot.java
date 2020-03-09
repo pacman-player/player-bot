@@ -5,9 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -63,11 +61,8 @@ public class Bot extends TelegramLongPollingBot {
 
             if (telegramMessage == null) {
                 state = BotState.getInitialState();
-                telegramMessage = new TelegramMessage(chatId, state.ordinal());
+                telegramMessage = new TelegramMessage(update.getMessage().getFrom(), state.ordinal());
                 telegramMessageService.addTelegramUser(telegramMessage);
-
-                addTelegramUserIfDoesNotExist(update.getMessage().getFrom());
-
                 context = new BotContext(this, telegramMessage, text, update);
                 state.enter(context);
             } else {
@@ -86,9 +81,15 @@ public class Bot extends TelegramLongPollingBot {
 
             if (update.getMessage().hasLocation()) {
                 context = new BotContext(this, telegramMessage, text, update);
-                state.handleInput(context, new LocationDto(context.getUpdate().getMessage().getLocation().getLatitude(), context.getUpdate().getMessage().getLocation().getLongitude()));
+                state.handleInput(context, new LocationDto(
+                        context.getUpdate().getMessage().getLocation().getLatitude(),
+                        context.getUpdate().getMessage().getLocation().getLongitude()));
 
                 telegramMessage.setStateId(state.ordinal());
+
+                // Обозначаем текущего пользователя как реального посетителя,
+                // так как он поделился с нами своей геопозицией.
+                telegramMessage.setTelegramUserOurClient(true);
                 telegramMessageService.updateTelegramUser(telegramMessage);
 
                 return;
@@ -121,7 +122,12 @@ public class Bot extends TelegramLongPollingBot {
 
             telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
 
-            registerTelegramUserCompanyVisit(update.getCallbackQuery());
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения
+            // telegramMessage.setClient(true), то регистрируем его и факт посещения этого заведения в БД
+            if (telegramMessage.isTelegramUserOurClient() && "GeoLocation".equals(state.name())) {
+                registerUserAndVisit(context.getTelegramMessage());
+            }
+
             do {
                 state = state.nextState();
                 state.enter(context);
@@ -132,34 +138,19 @@ public class Bot extends TelegramLongPollingBot {
             telegramMessageService.updateTelegramUser(telegramMessage);
         } else if (update.hasPreCheckoutQuery()) {
             paymentPreCheckout(update);
-            return;
         }
     }
 
     /**
      * Метод регистрирует в нашей базе данных на сервере pacman-player-core
-     * факт посещения этим пользователем Telegram выбранного заведения
-     * @param callbackQuery
+     * пользователя Telegram и факт посещения этим пользователем заведения
+     * @param telegramMessage
      */
-    private void registerTelegramUserCompanyVisit(CallbackQuery callbackQuery) {
-        TelegramUser telegramUser = new TelegramUser(callbackQuery.getFrom());
-        Long companyId = Long.parseLong(callbackQuery.getData());
-        TelegramUserCompanyIdDto telegramUserCompanyIdDto = new TelegramUserCompanyIdDto(telegramUser, companyId);
-        telegramApiService.registerTelegramUserCompanyVisit(telegramUserCompanyIdDto);
-    }
-
-    /**
-     * Метод проверяет, зарегистрирован ли в нашей базе данных на сервере pacman-player-core
-     * этот пользователь Telegram, и, если нет, то сохраняем его.
-     * @param user
-     */
-    void addTelegramUserIfDoesNotExist(User user) {
-        Long telegramUserId = new Long(user.getId());
-        boolean isTelegramUserExists = telegramApiService.isTelegramUserExists(telegramUserId);
-        if (!isTelegramUserExists) {
-            TelegramUser telegramUser = new TelegramUser(user);
-            telegramApiService.addTelegramUser(telegramUser);
-        }
+    void registerUserAndVisit(TelegramMessage telegramMessage) {
+        TelegramUserDto telegramUserDto = new TelegramUserDto(telegramMessage);
+        Long companyId = telegramMessage.getCompanyId();
+        VisitDto visitDto = new VisitDto(telegramUserDto, companyId);
+        telegramApiService.registerUserAndVisit(visitDto);
     }
 
     private void paymentPreCheckout(Update update) {

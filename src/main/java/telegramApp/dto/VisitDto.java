@@ -5,26 +5,26 @@ package telegramApp.dto;
  * котором он хочет заказать песню.
  */
 
-public class TelegramUserCompanyIdDto {
+public class VisitDto {
 
-    private TelegramUser telegramUser;
+    private TelegramUserDto telegramUserDto;
 
     private Long companyId;
 
-    public TelegramUserCompanyIdDto() {
+    public VisitDto() {
     }
 
-    public TelegramUserCompanyIdDto(TelegramUser telegramUser, Long companyId) {
-        this.telegramUser = telegramUser;
+    public VisitDto(TelegramUserDto telegramUserDto, Long companyId) {
+        this.telegramUserDto = telegramUserDto;
         this.companyId = companyId;
     }
 
-    public TelegramUser getTelegramUser() {
-        return telegramUser;
+    public TelegramUserDto getTelegramUserDto() {
+        return telegramUserDto;
     }
 
-    public void setTelegramUser(TelegramUser telegramUser) {
-        this.telegramUser = telegramUser;
+    public void setTelegramUserDto(TelegramUserDto telegramUserDto) {
+        this.telegramUserDto = telegramUserDto;
     }
 
     public Long getCompanyId() {

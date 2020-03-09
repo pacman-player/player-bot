@@ -16,9 +16,5 @@ public interface TelegramApiService {
 
     SongResponse approveSong(SongRequest telegramMessage);
 
-    boolean isTelegramUserExists(Long telegramUserId);
-
-    void addTelegramUser(TelegramUser telegramUser);
-
-    void registerTelegramUserCompanyVisit(TelegramUserCompanyIdDto telegramUserCompanyIdDto);
+    void registerUserAndVisit(VisitDto visitDto);
 }

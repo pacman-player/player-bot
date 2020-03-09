@@ -247,6 +247,7 @@ public enum BotState {
             SuccessfulPayment successfulPayment = context.getSuccessfulPayment();
             if (successfulPayment != null && successfulPayment.getInvoicePayload().startsWith("pacman-player")) {
                 sendMessage(context, "Спасибо за оплату");
+
                 //DUPLICATE LINES
 //                TelegramMessage telegramMessage = context.getBot().getTelegramMessageFromDB(context.getTelegramMessage().getChatId());
 //                context.getBot().sendSongIdToServer(telegramMessage);
@@ -270,6 +271,13 @@ public enum BotState {
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
                 context.getBot().addSongToQueue(context.getTelegramMessage());
+
+                // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения -
+                // - telegramMessage.setClient(true), то после выбора заведения он был внесен в нашу БД -
+                // - registerUserAndVisit(context.getTelegramMessage()) и вносить его ещё раз не нужно.
+                if (!context.getTelegramMessage().isTelegramUserOurClient()) {
+                    context.getBot().registerUserAndVisit(context.getTelegramMessage());
+                }
                 sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
             } catch (Exception ex) {
                 ex.printStackTrace();

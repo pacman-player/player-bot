@@ -66,22 +66,14 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         restTemplate.postForObject(URL, httpEntity, Void.class);
     }
 
+    /**
+     * Метод регистрирует в нашей базе данных на сервере pacman-player-core
+     * пользователя Telegram и факт посещения этим пользователем заведения
+     * @param visitDto
+     */
     @Override
-    public boolean isTelegramUserExists(Long telegramUserId) {
-        String URL = serverPath + "/api/tlg/isTelegramUserExists";
-        boolean isExists = Boolean.parseBoolean(restTemplate.postForObject(URL, telegramUserId, String.class));
-        return isExists;
-    }
-
-    @Override
-    public void addTelegramUser(TelegramUser telegramUser) {
-        String URL = serverPath + "/api/tlg/addTelegramUser";
-        restTemplate.postForObject(URL, telegramUser, Void.class);
-    }
-
-    @Override
-    public void registerTelegramUserCompanyVisit(TelegramUserCompanyIdDto telegramUserCompanyIdDto) {
-        String URL = serverPath + "/api/tlg/registerVisit";
-        restTemplate.postForObject(URL, telegramUserCompanyIdDto, Void.class);
+    public void registerUserAndVisit(VisitDto visitDto) {
+        String URL = serverPath + "/api/tlg/registerTelegramUserAndVisit";
+        restTemplate.postForObject(URL, visitDto, Void.class);
     }
 }
