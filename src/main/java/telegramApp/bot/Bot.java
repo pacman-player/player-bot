@@ -147,7 +147,7 @@ public class Bot extends TelegramLongPollingBot {
      * @param telegramMessage
      */
     void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
-        TelegramUserDto telegramUserDto = new TelegramUserDto(telegramMessage);
+        TelegramUserDto telegramUserDto = telegramMessage.getTelegramUserDto();
         Long companyId = telegramMessage.getCompanyId();
         VisitDto visitDto = new VisitDto(telegramUserDto, companyId);
         telegramApiService.registerTelegramUserAndVisit(visitDto);

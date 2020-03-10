@@ -2,26 +2,46 @@ package telegramApp.model;
 
 
 import org.telegram.telegrambots.meta.api.objects.User;
+import telegramApp.dto.TelegramUserDto;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class TelegramMessage {
 
     @Id
+    @Column(name = "chat_id")
     private Long chatId;
-    private String telegramUserFirstName;
-    private Boolean isTelegramUserBot;
-    private String telegramUserLastName;
-    private String telegramUserName;
-    private String telegramUserLanguageCode;
+
+    @Column(name = "state_id")
     private int stateId;
+
+    @Column(name = "performer_name")
     private String performerName;
+
+    @Column(name = "song_name")
     private String songName;
+
+    @Column(name = "song_id")
     private Long songId;
+
+    @Column(name = "company_id")
     private Long companyId;
+
+    @Column(name = "position")
     private Long position;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride( name = "id", column = @Column(name = "t_user_id")),
+            @AttributeOverride( name = "firstName", column = @Column(name = "t_user_first_name")),
+            @AttributeOverride( name = "lastName", column = @Column(name = "t_user_last_name")),
+            @AttributeOverride( name = "userName", column = @Column(name = "t_user_name")),
+            @AttributeOverride( name = "languageCode", column = @Column(name = "t_user_language")),
+            @AttributeOverride( name = "isBot", column = @Column(name = "is_t_user_bot"))
+    })
+    private TelegramUserDto telegramUserDto;
+
     /**
      * Для принятия решения о записи в базу данных на сервер pacman-player-core
      * факта посещения пользователем Telegram заведения (Company) нам нужно
@@ -30,6 +50,7 @@ public class TelegramMessage {
      * нашей бизнес-логики это поле будет принимать значение true, если мы считаем,
      * что посетитель реальный.
      */
+    @Column(name = "is_t_user_client")
     private boolean isTelegramUserOurClient;
 
     public TelegramMessage() {
@@ -42,12 +63,8 @@ public class TelegramMessage {
 
     public TelegramMessage(User user, int ordinal) {
         this.chatId = Long.valueOf(user.getId());
-        this.telegramUserFirstName = user.getFirstName();
-        this.isTelegramUserBot = user.getBot();
-        this.telegramUserLastName = user.getLastName();
-        this.telegramUserName = user.getUserName();
-        this.telegramUserLanguageCode = user.getLanguageCode();
         this.stateId = ordinal;
+        this.telegramUserDto = new TelegramUserDto(user);
     }
 
     public Long getChatId() {
@@ -56,46 +73,6 @@ public class TelegramMessage {
 
     public void setChatId(Long chatId) {
         this.chatId = chatId;
-    }
-
-    public String getTelegramUserFirstName() {
-        return telegramUserFirstName;
-    }
-
-    public void setTelegramUserFirstName(String telegramUserFirstName) {
-        this.telegramUserFirstName = telegramUserFirstName;
-    }
-
-    public Boolean getTelegramUserBot() {
-        return isTelegramUserBot;
-    }
-
-    public void setTelegramUserBot(Boolean telegramUserBot) {
-        isTelegramUserBot = telegramUserBot;
-    }
-
-    public String getTelegramUserLastName() {
-        return telegramUserLastName;
-    }
-
-    public void setTelegramUserLastName(String telegramUserLastName) {
-        this.telegramUserLastName = telegramUserLastName;
-    }
-
-    public String getTelegramUserName() {
-        return telegramUserName;
-    }
-
-    public void setTelegramUserName(String telegramUserName) {
-        this.telegramUserName = telegramUserName;
-    }
-
-    public String getTelegramUserLanguageCode() {
-        return telegramUserLanguageCode;
-    }
-
-    public void setTelegramUserLanguageCode(String telegramUserLanguageCode) {
-        this.telegramUserLanguageCode = telegramUserLanguageCode;
     }
 
     public int getStateId() {
@@ -144,6 +121,14 @@ public class TelegramMessage {
 
     public void setPosition(Long position) {
         this.position = position;
+    }
+
+    public TelegramUserDto getTelegramUserDto() {
+        return telegramUserDto;
+    }
+
+    public void setTelegramUserDto(TelegramUserDto telegramUserDto) {
+        this.telegramUserDto = telegramUserDto;
     }
 
     public boolean isTelegramUserOurClient() {

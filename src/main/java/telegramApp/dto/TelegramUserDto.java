@@ -1,41 +1,46 @@
 package telegramApp.dto;
 
-import telegramApp.model.TelegramMessage;
+import org.telegram.telegrambots.meta.api.objects.User;
 
+import javax.persistence.Embeddable;
 import java.util.Objects;
 
 /**
  * Класс, описывающий посетителя заведения - пользователя мессенджера Telegram,
  * обратившегося к нашему боту для заказа песни. Объект данного класса предназначен
  * для обмена между pacman-player-core и player-bot. Схож с объектом User из Telegram API.
+ * Чтобы специально не создавать под него таблицу, решено "встроить" его в таблицу
+ * TelegramMessage.
  */
+
+@Embeddable
 public class TelegramUserDto {
 
     private Long id;
     private String firstName;
-    private Boolean isBot;
     private String lastName;
     private String userName;
     private String languageCode;
+    private Boolean isBot;
 
     public TelegramUserDto() {}
 
-    public TelegramUserDto(TelegramMessage telegramMessage) {
-        this.id = telegramMessage.getChatId();
-        this.firstName = telegramMessage.getTelegramUserFirstName();
-        this.isBot = telegramMessage.getTelegramUserBot();
-        this.lastName = telegramMessage.getTelegramUserLastName();
-        this.userName = telegramMessage.getTelegramUserName();
-        this.languageCode = telegramMessage.getTelegramUserLanguageCode();
+    public TelegramUserDto(User user) {
+        this.id = Long.valueOf(user.getId());
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.userName = user.getUserName();
+        this.languageCode = user.getLanguageCode();
+        this.isBot = user.getBot();
     }
 
     public TelegramUserDto(Long id, String firstName, Boolean isBot, String lastName, String userName, String languageCode) {
         this.id = id;
         this.firstName = firstName;
-        this.isBot = isBot;
         this.lastName = lastName;
         this.userName = userName;
         this.languageCode = languageCode;
+        this.isBot = isBot;
     }
 
     public Long getId() {
