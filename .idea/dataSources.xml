@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@localhost" uuid="2044ee4e-efe1-40b5-9e57-e5b58b8ecf74">
+    <data-source source="LOCAL" name="tlg_bot@localhost" uuid="2044ee4e-efe1-40b5-9e57-e5b58b8ecf74">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
@@ -14,6 +14,12 @@
         <property name="characterSetResults" value="utf8" />
         <property name="yearIsDateType" value="false" />
       </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="tlg_bot@localhost [2]" uuid="e82d72d4-f96b-4f41-9fa7-c241a0f5cac0">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/tlg_bot</jdbc-url>
     </data-source>
   </component>
 </project>
