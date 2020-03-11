@@ -3,8 +3,10 @@ package telegramApp.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "telegram_messages")
 public class TelegramMessage {
 
     @Id
