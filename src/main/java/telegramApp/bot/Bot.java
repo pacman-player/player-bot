@@ -89,7 +89,7 @@ public class Bot extends TelegramLongPollingBot {
 
                 // Обозначаем текущего пользователя как реального посетителя,
                 // так как он поделился с нами своей геопозицией.
-                telegramMessage.setTelegramUserRealClient(true);
+                telegramMessage.setTelegramUserSharedGeolocation(true);
                 telegramMessageService.updateTelegramUser(telegramMessage);
 
                 return;
@@ -122,10 +122,12 @@ public class Bot extends TelegramLongPollingBot {
 
             telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
 
-            // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения
-            // telegramMessage.setClient(true), то регистрируем его и факт посещения этого заведения в БД
-            if (telegramMessage.isTelegramUserRealClient() && "GeoLocation".equals(state.name())) {
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель
+            // заведения то регистрируем его и факт посещения этого заведения в БД
+            if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
                 registerTelegramUserAndVisit(context.getTelegramMessage());
+                telegramMessage.setVisitRegistered(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
             }
 
             do {
@@ -166,10 +168,10 @@ public class Bot extends TelegramLongPollingBot {
             // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения,
             // то после выбора заведения он был внесен в нашу БД и вносить его ещё раз не нужно.
             TelegramMessage telegramMessage = telegramMessageService.findByChatId(update.getPreCheckoutQuery().getFrom().getId());
-            if (!telegramMessage.isTelegramUserRealClient()) {
-                telegramMessage.setTelegramUserRealClient(true);
-                telegramMessageService.updateTelegramUser(telegramMessage);
+            if (!telegramMessage.isVisitRegistered()) {
                 registerTelegramUserAndVisit(telegramMessage);
+                telegramMessage.setVisitRegistered(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
             }
         } else {
             answer.setOk(false);

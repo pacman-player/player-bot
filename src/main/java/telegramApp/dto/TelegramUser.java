@@ -16,22 +16,22 @@ import java.util.Objects;
 @Embeddable
 public class TelegramUser {
 
-    @Column(name = "t_user_id")
+    @Column(name = "t_u_id")
     private Long id;
 
-    @Column(name = "t_user_first_name")
+    @Column(name = "t_u_first_name")
     private String firstName;
 
-    @Column(name = "t_user_last_name")
+    @Column(name = "t_u_last_name")
     private String lastName;
 
-    @Column(name = "t_user_name")
+    @Column(name = "t_u_name")
     private String userName;
 
-    @Column(name = "t_user_lang")
+    @Column(name = "t_u_lang")
     private String languageCode;
 
-    @Column(name = "is_t_user_bot")
+    @Column(name = "is_t_u_bot")
     private Boolean isBot;
 
     public TelegramUser() {}

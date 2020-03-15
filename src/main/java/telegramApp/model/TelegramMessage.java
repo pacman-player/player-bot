@@ -38,12 +38,16 @@ public class TelegramMessage {
      * Для принятия решения о записи в базу данных на сервер pacman-player-core
      * факта посещения пользователем Telegram заведения (Company) нам нужно
      * знать, имеем ли мы дело с реальным посетителем заведения или человек
-     * просто лазает в нашем боте и нажимает на кнопки. При срабатывании условий
-     * нашей бизнес-логики это поле будет принимать значение true, если мы считаем,
-     * что посетитель реальный и его посещение нужно внести в базу.
+     * просто лазает в нашем боте и нажимает на кнопки. При срабатывании одного из
+     * условий нашей бизнес-логики, когда пользователь Telegram поделился с нами
+     * своей геопозицией, это поле будет принимать значение true, значит мы
+     * считаем, что посетитель реальный и его посещение нужно внести в базу.
      */
-    @Column(name = "is_real_client")
-    private boolean isTelegramUserRealClient;
+    @Column(name = "is_t_u_shared_geo")
+    private boolean isTelegramUserSharedGeolocation;
+
+    @Column(name = "is_visit_registered")
+    private boolean isVisitRegistered;
 
     public TelegramMessage() {
     }
@@ -123,11 +127,19 @@ public class TelegramMessage {
         this.telegramUser = telegramUser;
     }
 
-    public boolean isTelegramUserRealClient() {
-        return isTelegramUserRealClient;
+    public boolean isTelegramUserSharedGeolocation() {
+        return isTelegramUserSharedGeolocation;
     }
 
-    public void setTelegramUserRealClient(boolean telegramUserRealClient) {
-        isTelegramUserRealClient = telegramUserRealClient;
+    public void setTelegramUserSharedGeolocation(boolean telegramUserSharedGeolocation) {
+        isTelegramUserSharedGeolocation = telegramUserSharedGeolocation;
+    }
+
+    public boolean isVisitRegistered() {
+        return isVisitRegistered;
+    }
+
+    public void setVisitRegistered(boolean visitRegistered) {
+        isVisitRegistered = visitRegistered;
     }
 }
