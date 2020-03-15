@@ -44,6 +44,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * Метод передает на сервер pacman-player-core инфу о песне которую нужно найти. На сервере песня если
      * скачивается с одного из сервисов по поиску музыки - сохраняется в папку music/ и возвращается в бота с инфой
      * о том какой id у песни на сервере, с 30сек отрезком и полным названием трека.
+     *
      * @param songRequest
      * @return
      */
@@ -54,6 +55,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
 
     /**
      * Метод добавляющий утвержденную песню в очередь SongQueue на сервере pacman-player-core после ее оплаты.
+     *
      * @param songId
      * @param companyId
      */
@@ -66,11 +68,6 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         restTemplate.postForObject(URL, httpEntity, Void.class);
     }
 
-    /**
-     * Метод регистрирует в нашей базе данных на сервере pacman-player-core
-     * пользователя Telegram и факт посещения этим пользователем заведения
-     * @param visitDto
-     */
     @Override
     public void registerTelegramUserAndVisit(VisitDto visitDto) {
         String URL = serverPath + "/api/tlg/registerTelegramUserAndVisit";

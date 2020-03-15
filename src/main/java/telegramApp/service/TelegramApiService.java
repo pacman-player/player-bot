@@ -16,5 +16,10 @@ public interface TelegramApiService {
 
     SongResponse approveSong(SongRequest telegramMessage);
 
+    /**
+     * Метод регистрирует пользователя Telegram и факт посещения этим пользователем
+     * заведения в нашей базе данных на сервере pacman-player-core.
+     * @param visitDto
+     */
     void registerTelegramUserAndVisit(VisitDto visitDto);
 }

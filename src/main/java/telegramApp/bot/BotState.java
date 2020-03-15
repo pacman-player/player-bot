@@ -76,7 +76,7 @@ public enum BotState {
         public void handleInput(BotContext context, LocationDto locationDto) {
             List<LinkedHashMap<String, String>> companies = context.getBot().sendGeoLocationToServer(locationDto);
 
-            if(companies.isEmpty()){
+            if (companies.isEmpty()) {
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
                 companies = context.getBot().getAllCompany();
 
@@ -271,13 +271,6 @@ public enum BotState {
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
                 context.getBot().addSongToQueue(context.getTelegramMessage());
-
-                // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения,
-                // то после выбора заведения он был внесен в нашу БД и вносить его ещё раз не нужно.
-                if (!context.getTelegramMessage().isTelegramUserOurClient()) {
-                    context.getTelegramMessage().setTelegramUserOurClient(true);
-                    context.getBot().registerTelegramUserAndVisit(context.getTelegramMessage());
-                }
                 sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -383,7 +376,7 @@ public enum BotState {
     }
 
     //показывает действия собеседника
-    protected void sendAction(BotContext context, ActionType actionType){
+    protected void sendAction(BotContext context, ActionType actionType) {
         SendChatAction sendAction = new SendChatAction();
         sendAction.setAction(actionType);
         sendAction.setChatId(context.getTelegramMessage().getChatId());
@@ -395,7 +388,7 @@ public enum BotState {
         }
     }
 
-    protected void sendAnimation(BotContext context, String url, int width, int height){
+    protected void sendAnimation(BotContext context, String url, int width, int height) {
         SendAnimation sendAnimation = new SendAnimation();
         sendAnimation.setChatId(context.getTelegramMessage().getChatId());
         sendAnimation.setAnimation(url);
@@ -413,9 +406,14 @@ public enum BotState {
         return inputNeeded;
     }
 
-    public void handleInput(BotContext context) {}
-    public void handleInput(BotContext context, Update update) {}
-    public void handleInput(BotContext context, LocationDto locationDto) {}
+    public void handleInput(BotContext context) {
+    }
+
+    public void handleInput(BotContext context, Update update) {
+    }
+
+    public void handleInput(BotContext context, LocationDto locationDto) {
+    }
 
     public abstract void enter(BotContext context);
 

@@ -89,7 +89,7 @@ public class Bot extends TelegramLongPollingBot {
 
                 // Обозначаем текущего пользователя как реального посетителя,
                 // так как он поделился с нами своей геопозицией.
-                telegramMessage.setTelegramUserOurClient(true);
+                telegramMessage.setTelegramUserRealClient(true);
                 telegramMessageService.updateTelegramUser(telegramMessage);
 
                 return;
@@ -124,7 +124,7 @@ public class Bot extends TelegramLongPollingBot {
 
             // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения
             // telegramMessage.setClient(true), то регистрируем его и факт посещения этого заведения в БД
-            if (telegramMessage.isTelegramUserOurClient() && "GeoLocation".equals(state.name())) {
+            if (telegramMessage.isTelegramUserRealClient() && "GeoLocation".equals(state.name())) {
                 registerTelegramUserAndVisit(context.getTelegramMessage());
             }
 
@@ -144,12 +144,13 @@ public class Bot extends TelegramLongPollingBot {
     /**
      * Метод регистрирует в нашей базе данных на сервере pacman-player-core
      * пользователя Telegram и факт посещения этим пользователем заведения
+     *
      * @param telegramMessage
      */
     void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
-        TelegramUserDto telegramUserDto = telegramMessage.getTelegramUserDto();
+        TelegramUser telegramUser = telegramMessage.getTelegramUser();
         Long companyId = telegramMessage.getCompanyId();
-        VisitDto visitDto = new VisitDto(telegramUserDto, companyId);
+        VisitDto visitDto = new VisitDto(telegramUser, companyId);
         telegramApiService.registerTelegramUserAndVisit(visitDto);
     }
 
@@ -161,6 +162,15 @@ public class Bot extends TelegramLongPollingBot {
             answer.setOk(true);
             answer.setPreCheckoutQueryId(query.getId());
             success = true;
+
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения,
+            // то после выбора заведения он был внесен в нашу БД и вносить его ещё раз не нужно.
+            TelegramMessage telegramMessage = telegramMessageService.findByChatId(update.getPreCheckoutQuery().getFrom().getId());
+            if (!telegramMessage.isTelegramUserRealClient()) {
+                telegramMessage.setTelegramUserRealClient(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
+                registerTelegramUserAndVisit(telegramMessage);
+            }
         } else {
             answer.setOk(false);
             answer.setErrorMessage("Что-то пошло не так, попробуйте сначала");

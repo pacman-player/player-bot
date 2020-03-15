@@ -2,7 +2,7 @@ package telegramApp.model;
 
 
 import org.telegram.telegrambots.meta.api.objects.User;
-import telegramApp.dto.TelegramUserDto;
+import telegramApp.dto.TelegramUser;
 
 import javax.persistence.*;
 
@@ -32,15 +32,7 @@ public class TelegramMessage {
     private Long position;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride( name = "id", column = @Column(name = "t_user_id")),
-            @AttributeOverride( name = "firstName", column = @Column(name = "t_user_first_name")),
-            @AttributeOverride( name = "lastName", column = @Column(name = "t_user_last_name")),
-            @AttributeOverride( name = "userName", column = @Column(name = "t_user_name")),
-            @AttributeOverride( name = "languageCode", column = @Column(name = "t_user_language")),
-            @AttributeOverride( name = "isBot", column = @Column(name = "is_t_user_bot"))
-    })
-    private TelegramUserDto telegramUserDto;
+    private TelegramUser telegramUser;
 
     /**
      * Для принятия решения о записи в базу данных на сервер pacman-player-core
@@ -48,10 +40,10 @@ public class TelegramMessage {
      * знать, имеем ли мы дело с реальным посетителем заведения или человек
      * просто лазает в нашем боте и нажимает на кнопки. При срабатывании условий
      * нашей бизнес-логики это поле будет принимать значение true, если мы считаем,
-     * что посетитель реальный.
+     * что посетитель реальный и его посещение нужно внести в базу.
      */
-    @Column(name = "is_t_user_client")
-    private boolean isTelegramUserOurClient;
+    @Column(name = "is_real_client")
+    private boolean isTelegramUserRealClient;
 
     public TelegramMessage() {
     }
@@ -64,7 +56,7 @@ public class TelegramMessage {
     public TelegramMessage(User user, int ordinal) {
         this.chatId = Long.valueOf(user.getId());
         this.stateId = ordinal;
-        this.telegramUserDto = new TelegramUserDto(user);
+        this.telegramUser = new TelegramUser(user);
     }
 
     public Long getChatId() {
@@ -123,19 +115,19 @@ public class TelegramMessage {
         this.position = position;
     }
 
-    public TelegramUserDto getTelegramUserDto() {
-        return telegramUserDto;
+    public TelegramUser getTelegramUser() {
+        return telegramUser;
     }
 
-    public void setTelegramUserDto(TelegramUserDto telegramUserDto) {
-        this.telegramUserDto = telegramUserDto;
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
     }
 
-    public boolean isTelegramUserOurClient() {
-        return isTelegramUserOurClient;
+    public boolean isTelegramUserRealClient() {
+        return isTelegramUserRealClient;
     }
 
-    public void setTelegramUserOurClient(boolean telegramUserOurClient) {
-        isTelegramUserOurClient = telegramUserOurClient;
+    public void setTelegramUserRealClient(boolean telegramUserRealClient) {
+        isTelegramUserRealClient = telegramUserRealClient;
     }
 }

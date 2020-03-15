@@ -10,20 +10,21 @@ import javax.transaction.Transactional;
 public class TelegramMessageServiceImpl implements TelegramMessageService {
     private TelegramMessageRepo telegramMessageRepo;
 
-    public TelegramMessageServiceImpl(TelegramMessageRepo telegramMessageRepo){
+    public TelegramMessageServiceImpl(TelegramMessageRepo telegramMessageRepo) {
         this.telegramMessageRepo = telegramMessageRepo;
     }
 
     @Transactional
-    public TelegramMessage findByChatId(long id){
+    public TelegramMessage findByChatId(long id) {
         return telegramMessageRepo.findByChatId(id);
     }
 
-    public void deleteByChatId (Long id){
+    public void deleteByChatId(Long id) {
         telegramMessageRepo.delete(telegramMessageRepo.findByChatId(id));
     }
+
     @Transactional
-    public void addTelegramUser (TelegramMessage telegramMessage){
+    public void addTelegramUser(TelegramMessage telegramMessage) {
         telegramMessageRepo.save(telegramMessage);
     }
 

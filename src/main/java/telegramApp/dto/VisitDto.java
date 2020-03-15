@@ -7,24 +7,24 @@ package telegramApp.dto;
 
 public class VisitDto {
 
-    private TelegramUserDto telegramUserDto;
+    private TelegramUser telegramUser;
 
     private Long companyId;
 
     public VisitDto() {
     }
 
-    public VisitDto(TelegramUserDto telegramUserDto, Long companyId) {
-        this.telegramUserDto = telegramUserDto;
+    public VisitDto(TelegramUser telegramUser, Long companyId) {
+        this.telegramUser = telegramUser;
         this.companyId = companyId;
     }
 
-    public TelegramUserDto getTelegramUserDto() {
-        return telegramUserDto;
+    public TelegramUser getTelegramUser() {
+        return telegramUser;
     }
 
-    public void setTelegramUserDto(TelegramUserDto telegramUserDto) {
-        this.telegramUserDto = telegramUserDto;
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
     }
 
     public Long getCompanyId() {
