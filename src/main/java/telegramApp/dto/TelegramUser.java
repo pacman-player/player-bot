@@ -34,7 +34,8 @@ public class TelegramUser {
     @Column(name = "is_t_u_bot")
     private Boolean isBot;
 
-    public TelegramUser() {}
+    public TelegramUser() {
+    }
 
     public TelegramUser(Long id, String firstName, String lastName, String userName, String languageCode, Boolean isBot) {
         this.id = id;

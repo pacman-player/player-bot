@@ -1,12 +1,12 @@
 package telegramApp.model;
 
-
 import org.telegram.telegrambots.meta.api.objects.User;
 import telegramApp.dto.TelegramUser;
 
 import javax.persistence.*;
 
 @Entity
+@Table(name = "telegram_messages")
 public class TelegramMessage {
 
     @Id
