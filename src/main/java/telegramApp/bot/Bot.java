@@ -5,16 +5,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
+import telegramApp.dto.*;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
@@ -64,10 +61,9 @@ public class Bot extends TelegramLongPollingBot {
 
             if (telegramMessage == null) {
                 state = BotState.getInitialState();
-                telegramMessage = new TelegramMessage(chatId, state.ordinal());
+                telegramMessage = new TelegramMessage(update.getMessage().getFrom(), state.ordinal());
                 telegramMessageService.addTelegramUser(telegramMessage);
-
-                context = new BotContext(this, telegramMessage, text);
+                context = new BotContext(this, telegramMessage, text, update);
                 state.enter(context);
             } else {
                 if (text.equals("/start")) {
@@ -85,9 +81,15 @@ public class Bot extends TelegramLongPollingBot {
 
             if (update.getMessage().hasLocation()) {
                 context = new BotContext(this, telegramMessage, text, update);
-                state.handleInput(context, new LocationDto(context.getUpdate().getMessage().getLocation().getLatitude(), context.getUpdate().getMessage().getLocation().getLongitude()));
+                state.handleInput(context, new LocationDto(
+                        context.getUpdate().getMessage().getLocation().getLatitude(),
+                        context.getUpdate().getMessage().getLocation().getLongitude()));
 
                 telegramMessage.setStateId(state.ordinal());
+
+                // Обозначаем текущего пользователя как реального посетителя,
+                // так как он поделился с нами своей геопозицией.
+                telegramMessage.setTelegramUserSharedGeolocation(true);
                 telegramMessageService.updateTelegramUser(telegramMessage);
 
                 return;
@@ -119,6 +121,15 @@ public class Bot extends TelegramLongPollingBot {
             context = new BotContext(this, telegramMessage, text);
 
             telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
+
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель
+            // заведения то регистрируем его и факт посещения этого заведения в БД
+            if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
+                registerTelegramUserAndVisit(context.getTelegramMessage());
+                telegramMessage.setVisitRegistered(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
+            }
+
             do {
                 state = state.nextState();
                 state.enter(context);
@@ -129,8 +140,20 @@ public class Bot extends TelegramLongPollingBot {
             telegramMessageService.updateTelegramUser(telegramMessage);
         } else if (update.hasPreCheckoutQuery()) {
             paymentPreCheckout(update);
-            return;
         }
+    }
+
+    /**
+     * Метод регистрирует в нашей базе данных на сервере pacman-player-core
+     * пользователя Telegram и факт посещения этим пользователем заведения
+     *
+     * @param telegramMessage
+     */
+    void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
+        TelegramUser telegramUser = telegramMessage.getTelegramUser();
+        Long companyId = telegramMessage.getCompanyId();
+        VisitDto visitDto = new VisitDto(telegramUser, companyId);
+        telegramApiService.registerTelegramUserAndVisit(visitDto);
     }
 
     private void paymentPreCheckout(Update update) {
@@ -141,6 +164,15 @@ public class Bot extends TelegramLongPollingBot {
             answer.setOk(true);
             answer.setPreCheckoutQueryId(query.getId());
             success = true;
+
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения,
+            // то после выбора заведения он был внесен в нашу БД и вносить его ещё раз не нужно.
+            TelegramMessage telegramMessage = telegramMessageService.findByChatId(update.getPreCheckoutQuery().getFrom().getId());
+            if (!telegramMessage.isVisitRegistered()) {
+                registerTelegramUserAndVisit(telegramMessage);
+                telegramMessage.setVisitRegistered(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
+            }
         } else {
             answer.setOk(false);
             answer.setErrorMessage("Что-то пошло не так, попробуйте сначала");

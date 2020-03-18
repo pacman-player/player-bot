@@ -1,7 +1,6 @@
 package telegramApp.configuration;
 
 import org.hibernate.dialect.MySQL5Dialect;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.springframework.stereotype.Component;
 
 @Component
