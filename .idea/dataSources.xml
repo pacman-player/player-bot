@@ -5,15 +5,7 @@
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306</jdbc-url>
-      <driver-properties>
-        <property name="autoReconnect" value="true" />
-        <property name="zeroDateTimeBehavior" value="CONVERT_TO_NULL" />
-        <property name="tinyInt1isBit" value="false" />
-        <property name="characterEncoding" value="utf8" />
-        <property name="characterSetResults" value="utf8" />
-        <property name="yearIsDateType" value="false" />
-      </driver-properties>
+      <jdbc-url>jdbc:mysql://localhost:3306/tlg_bot?serverTimezone=Europe/Moscow&amp;verifyServerCertificate=false&amp;useSSL=true&amp;useUnicode=true&amp;characterEncoding=utf8</jdbc-url>
     </data-source>
     <data-source source="LOCAL" name="tlg_bot@localhost [2]" uuid="e82d72d4-f96b-4f41-9fa7-c241a0f5cac0">
       <driver-ref>postgresql</driver-ref>
