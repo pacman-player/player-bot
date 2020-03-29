@@ -10,7 +10,7 @@ public interface TelegramApiService {
 
     List sendGeoLocation(LocationDto locationDto);
 
-    List getAllCompany();
+    List getAllCompanies();
 
     void addSongToQueue(long songId, long companyId);
 
@@ -19,6 +19,7 @@ public interface TelegramApiService {
     /**
      * Метод регистрирует пользователя Telegram и факт посещения этим пользователем
      * заведения в нашей базе данных на сервере pacman-player-core.
+     *
      * @param visitDto
      */
     void registerTelegramUserAndVisit(VisitDto visitDto);

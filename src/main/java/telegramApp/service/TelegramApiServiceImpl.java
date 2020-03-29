@@ -19,11 +19,15 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     @Value("${server.path}")
     private String serverPath;
 
+    // Установим логин и пароль, который будет использоваться при подключении к
+    // РЕСТ-контроллерам player-core.
     public TelegramApiServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
+                .basicAuthentication("bot", "bot")
                 .build();
     }
 
+    @Override
     public SongResponse sendAuthorAndSongName(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/song";
         return restTemplate.postForObject(URL, songRequest, SongResponse.class);
@@ -35,7 +39,8 @@ public class TelegramApiServiceImpl implements TelegramApiService {
         return restTemplate.postForObject(URL, locationDto, List.class);
     }
 
-    public List getAllCompany() {
+    @Override
+    public List getAllCompanies() {
         String URL = serverPath + "/api/tlg/all_company";
         return restTemplate.postForObject(URL, null, List.class);
     }
@@ -48,6 +53,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * @param songRequest
      * @return
      */
+    @Override
     public SongResponse approveSong(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/approve";
         return restTemplate.postForObject(URL, songRequest, SongResponse.class);
@@ -59,6 +65,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * @param songId
      * @param companyId
      */
+    @Override
     public void addSongToQueue(long songId, long companyId) {
         String URL = serverPath + "/api/tlg/addSongToQueue";
         HttpHeaders headers = new HttpHeaders();
