@@ -7,7 +7,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.*;
+import telegramApp.dto.LocationDto;
+import telegramApp.dto.SongRequest;
+import telegramApp.dto.SongResponse;
+import telegramApp.dto.VisitDto;
 
 import java.util.List;
 
@@ -19,8 +22,8 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     @Value("${server.path}")
     private String serverPath;
 
-    // Установим логин и пароль, который будет использоваться при подключении к
-    // РЕСТ-контроллерам player-core.
+    // Установим логин и пароль, которые будут использоваться при подключении к
+    // РЕСТ-контроллерам player-core в рамках базовой аутентификации.
     public TelegramApiServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
                 .basicAuthentication("bot", "bot")
