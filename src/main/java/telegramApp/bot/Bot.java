@@ -218,7 +218,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     List getAllCompany() {
-        return telegramApiService.getAllCompany();
+        return telegramApiService.getAllCompanies();
     }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
