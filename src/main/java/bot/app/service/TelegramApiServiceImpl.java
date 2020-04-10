@@ -1,5 +1,9 @@
-package telegramApp.service;
+package bot.app.service;
 
+import bot.app.dto.LocationDto;
+import bot.app.dto.SongRequest;
+import bot.app.dto.SongResponse;
+import bot.app.dto.VisitDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
@@ -7,7 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.*;
 
 import java.util.List;
 

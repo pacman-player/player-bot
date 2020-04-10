@@ -1,5 +1,9 @@
-package telegramApp.bot;
+package bot.app.bot;
 
+import bot.app.dto.*;
+import bot.app.model.TelegramMessage;
+import bot.app.service.TelegramApiService;
+import bot.app.service.TelegramMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -11,10 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.*;
-import telegramApp.model.TelegramMessage;
-import telegramApp.service.TelegramApiService;
-import telegramApp.service.TelegramMessageService;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
-package telegramApp.model;
+package bot.app.model;
 
+import bot.app.dto.TelegramUser;
 import org.telegram.telegrambots.meta.api.objects.User;
-import telegramApp.dto.TelegramUser;
 
 import javax.persistence.*;
 

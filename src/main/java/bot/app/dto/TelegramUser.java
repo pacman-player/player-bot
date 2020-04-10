@@ -1,4 +1,4 @@
-package telegramApp.dto;
+package bot.app.dto;
 
 import org.telegram.telegrambots.meta.api.objects.User;
 

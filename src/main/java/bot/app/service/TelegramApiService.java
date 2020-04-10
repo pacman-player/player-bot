@@ -1,6 +1,9 @@
-package telegramApp.service;
+package bot.app.service;
 
-import telegramApp.dto.*;
+import bot.app.dto.LocationDto;
+import bot.app.dto.SongRequest;
+import bot.app.dto.SongResponse;
+import bot.app.dto.VisitDto;
 
 import java.util.List;
 

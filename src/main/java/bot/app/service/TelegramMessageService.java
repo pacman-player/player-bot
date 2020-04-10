@@ -1,7 +1,7 @@
-package telegramApp.service;
+package bot.app.service;
 
+import bot.app.model.TelegramMessage;
 import org.springframework.transaction.annotation.Transactional;
-import telegramApp.model.TelegramMessage;
 
 @Transactional
 public interface TelegramMessageService {

@@ -1,8 +1,8 @@
-package telegramApp.bot;
+package bot.app.bot;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
-import telegramApp.model.TelegramMessage;
+import bot.app.model.TelegramMessage;
 
 public class BotContext {
 

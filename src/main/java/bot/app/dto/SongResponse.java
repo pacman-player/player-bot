@@ -1,4 +1,4 @@
-package telegramApp.dto;
+package bot.app.dto;
 
 public class SongResponse {
 

@@ -1,7 +1,7 @@
-package telegramApp.repo;
+package bot.app.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import telegramApp.model.TelegramMessage;
+import bot.app.model.TelegramMessage;
 
 public interface TelegramMessageRepo extends JpaRepository<TelegramMessage, Long> {
     TelegramMessage findByChatId(long id);

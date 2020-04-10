@@ -1,8 +1,8 @@
-package telegramApp.service;
+package bot.app.service;
 
+import bot.app.model.TelegramMessage;
+import bot.app.repo.TelegramMessageRepo;
 import org.springframework.stereotype.Service;
-import telegramApp.model.TelegramMessage;
-import telegramApp.repo.TelegramMessageRepo;
 
 import javax.transaction.Transactional;
 

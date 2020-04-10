@@ -1,4 +1,4 @@
-package telegramApp.dto;
+package bot.app.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,6 +1,6 @@
-package telegramApp.dto;
+package bot.app.dto;
 
-import telegramApp.model.TelegramMessage;
+import bot.app.model.TelegramMessage;
 
 public class SongRequest {
     private Long chatId;

@@ -1,4 +1,4 @@
-package telegramApp.dto;
+package bot.app.dto;
 
 /**
  * Класс для передачи TelegramUser и номера заведения (company), в

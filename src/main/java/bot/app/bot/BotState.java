@@ -1,4 +1,4 @@
-package telegramApp.bot;
+package bot.app.bot;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
@@ -13,9 +13,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongResponse;
-import telegramApp.model.TelegramMessage;
+import bot.app.dto.LocationDto;
+import bot.app.dto.SongResponse;
+import bot.app.model.TelegramMessage;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;

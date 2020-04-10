@@ -4,13 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>tlgBot</groupId>
-    <artifactId>tlgBot</artifactId>
+    <groupId>pacman-player</groupId>
+    <artifactId>player-bot</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
-    <name>telegram-spring-boot-starter-example</name>
-    <description>Starter pom for the telegram bot project</description>
+    <name>player-bot</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
