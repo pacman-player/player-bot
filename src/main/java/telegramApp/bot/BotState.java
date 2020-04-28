@@ -319,7 +319,7 @@ public enum BotState {
         return sendMessage;
     }
 
-    public static SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, List<LinkedHashMap<String, String>> listOfCompanies) {
+    public static synchronized SendMessage sendInlineKeyBoardMessageListOfCompanies(long chatId, List<LinkedHashMap<String, String>> listOfCompanies) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
@@ -352,7 +352,7 @@ public enum BotState {
         return states[id];
     }
 
-    protected void sendMessage(BotContext context, String text) {
+    protected synchronized void sendMessage(BotContext context, String text) {
         SendMessage message = new SendMessage()
                 .setChatId(context.getTelegramMessage().getChatId())
                 .setText(text);
@@ -363,7 +363,7 @@ public enum BotState {
         }
     }
 
-    protected void sendTrack(BotContext context, SongResponse songResponse) {
+    protected synchronized void sendTrack(BotContext context, SongResponse songResponse) {
         SendAudio sendAudio = new SendAudio();
         sendAudio.setAudio(songResponse.getTrackName(), new ByteArrayInputStream(songResponse.getTrack()));
         sendAudio.setChatId(context.getTelegramMessage().getChatId());
@@ -376,7 +376,7 @@ public enum BotState {
     }
 
     //показывает действия собеседника
-    protected void sendAction(BotContext context, ActionType actionType) {
+    protected synchronized void sendAction(BotContext context, ActionType actionType) {
         SendChatAction sendAction = new SendChatAction();
         sendAction.setAction(actionType);
         sendAction.setChatId(context.getTelegramMessage().getChatId());
@@ -388,7 +388,7 @@ public enum BotState {
         }
     }
 
-    protected void sendAnimation(BotContext context, String url, int width, int height) {
+    protected synchronized void sendAnimation(BotContext context, String url, int width, int height) {
         SendAnimation sendAnimation = new SendAnimation();
         sendAnimation.setChatId(context.getTelegramMessage().getChatId());
         sendAnimation.setAnimation(url);

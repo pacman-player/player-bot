@@ -14,10 +14,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import telegramApp.dto.*;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
+import telegramApp.service.TelegramMessageReciever;
+import telegramApp.service.TelegramMessageSendler;
 import telegramApp.service.TelegramMessageService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 @PropertySource("classpath:telegram.properties")
@@ -26,6 +30,9 @@ public class Bot extends TelegramLongPollingBot {
     private final TelegramMessageService telegramMessageService;
 
     private final TelegramApiService telegramApiService;
+
+    public final Queue<Object> sendQueue = new ConcurrentLinkedQueue<>();
+    public final Queue<Object> receiveQueue = new ConcurrentLinkedQueue<>();
 
     @Value("${bot.name}")
     private String botName;
@@ -49,95 +56,22 @@ public class Bot extends TelegramLongPollingBot {
         BotState state;
         String text;
 
+//        if(update.hasMessage()) {
+//            ThreadClass thread = new ThreadClass(update.getMessage());
+//        } else  if(update.hasCallbackQuery()) {
+//            AnswerCallbackThread answerThread = new AnswerCallbackThread(update.getCallbackQuery());
+//        }
+
         if (update.hasMessage()) {
-            chatId = update.getMessage().getChatId();
-            telegramMessage = telegramMessageService.findByChatId(chatId);
 
-            if (update.getMessage().hasText()) {
-                text = update.getMessage().getText();
-            } else {
-                text = "";
-            }
+            TelegramMessageReciever messageReciever = new TelegramMessageReciever(this, update, telegramMessageService, telegramApiService);
+            messageReciever.run();
 
-            if (telegramMessage == null) {
-                state = BotState.getInitialState();
-                telegramMessage = new TelegramMessage(update.getMessage().getFrom(), state.ordinal());
-                telegramMessageService.addTelegramUser(telegramMessage);
-                context = new BotContext(this, telegramMessage, text, update);
-                state.enter(context);
-            } else {
-                if (text.equals("/start")) {
-                    state = BotState.getInitialState();
-                } else {
-                    state = BotState.byId(telegramMessage.getStateId());
-                }
 
-                if (state.name().equals("Payment")) {
-                    context = new BotContext(this, telegramMessage, text, update.getMessage().getSuccessfulPayment());
-                } else {
-                    context = new BotContext(this, telegramMessage, text);
-                }
-            }
-
-            if (update.getMessage().hasLocation()) {
-                context = new BotContext(this, telegramMessage, text, update);
-                state.handleInput(context, new LocationDto(
-                        context.getUpdate().getMessage().getLocation().getLatitude(),
-                        context.getUpdate().getMessage().getLocation().getLongitude()));
-
-                telegramMessage.setStateId(state.ordinal());
-
-                // Обозначаем текущего пользователя как реального посетителя,
-                // так как он поделился с нами своей геопозицией.
-                telegramMessage.setTelegramUserSharedGeolocation(true);
-                telegramMessageService.updateTelegramUser(telegramMessage);
-
-                return;
-            } else if (state.name().equals("GeoLocation") & !update.getMessage().hasLocation()) {
-                state.handleInput(context);
-
-                telegramMessage.setStateId(state.ordinal());
-                telegramMessageService.updateTelegramUser(telegramMessage);
-
-                return;
-            }
-
-            state.handleInput(context);
-            do {
-                state = state.nextState();
-                state.enter(context);
-            }
-            while (!state.isInputNeeded());
-
-            telegramMessage.setStateId(state.ordinal());
-            telegramMessageService.updateTelegramUser(telegramMessage);
         } else if (update.hasCallbackQuery()) {
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            telegramMessage = telegramMessageService.findByChatId(chatId);
-            text = update.getCallbackQuery().getMessage().getText();
 
-            state = BotState.byId(telegramMessage.getStateId());
-
-            context = new BotContext(this, telegramMessage, text);
-
-            telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
-
-            // Если этот пользовтель Telegram ранее был определен как реальный посетитель
-            // заведения то регистрируем его и факт посещения этого заведения в БД
-            if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
-                registerTelegramUserAndVisit(context.getTelegramMessage());
-                telegramMessage.setVisitRegistered(true);
-                telegramMessageService.updateTelegramUser(telegramMessage);
-            }
-
-            do {
-                state = state.nextState();
-                state.enter(context);
-            }
-            while (!state.isInputNeeded());
-
-            telegramMessage.setStateId(state.ordinal());
-            telegramMessageService.updateTelegramUser(telegramMessage);
+            TelegramMessageSendler messageSendler = new TelegramMessageSendler(this, update, telegramMessageService, telegramApiService);
+            messageSendler.run();
         } else if (update.hasPreCheckoutQuery()) {
             paymentPreCheckout(update);
         }
@@ -149,7 +83,7 @@ public class Bot extends TelegramLongPollingBot {
      *
      * @param telegramMessage
      */
-    void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
+    public void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
         TelegramUser telegramUser = telegramMessage.getTelegramUser();
         Long companyId = telegramMessage.getCompanyId();
         VisitDto visitDto = new VisitDto(telegramUser, companyId);
