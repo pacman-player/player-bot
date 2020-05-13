@@ -219,9 +219,11 @@ public enum BotState {
                     next = EnterPerformerName;
                 }
 
-            } else {
+            } else if (text.equals("Нет")) {
                 sendMessage(context, "Ищу на других сервисах...");
                 next = GetSong;
+            } else {
+                next = EnterPerformerName;
             }
         }
 
