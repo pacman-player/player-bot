@@ -24,7 +24,6 @@ import java.util.List;
 
 @Component
 public enum BotState {
-
     Start(false) {
         @Override
         public void enter(BotContext context) {
@@ -130,8 +129,22 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context) {
-            next = ApproveSong;
+            next = GetSong;
             context.getTelegramMessage().setSongName(context.getInput());
+        }
+
+        @Override
+        public BotState nextState() {
+            return next;
+        }
+    },
+
+    GetSong(false) {
+        private BotState next;
+
+        @Override
+        public void enter(BotContext context) {
+            next = ApproveSong;
             sendMessage(context, "Песня загружается...");
             sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
@@ -193,7 +206,7 @@ public enum BotState {
                 //получаю из контекста позицию искомой песни в song_queue
                 Long position = context.getTelegramMessage().getPosition();
                 if (position == 0) {
-                    next = Payment;
+                    next = Approved;
                 } else {
                     if (position < 11) {
                         sendMessage(context, "Эта песня уже близко =)");
@@ -203,10 +216,12 @@ public enum BotState {
                         sendMessage(context, "Придется немного подождать...");
                         sendMessage(context, "Эта песня " + position + " в плейлисте!");
                     }
-
                     next = EnterPerformerName;
                 }
 
+            } else if (text.equals("Нет")) {
+                sendMessage(context, "Ищу на других сервисах...");
+                next = GetSong;
             } else {
                 next = EnterPerformerName;
             }
