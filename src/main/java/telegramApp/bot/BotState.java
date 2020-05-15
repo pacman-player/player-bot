@@ -1,5 +1,7 @@
 package telegramApp.bot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
@@ -14,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
 import telegramApp.dto.LocationDto;
+import telegramApp.dto.SongRequest;
 import telegramApp.dto.SongResponse;
 import telegramApp.model.TelegramMessage;
 
@@ -21,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public enum BotState {
@@ -61,8 +66,8 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context) {
-            List<LinkedHashMap<String, String>> companies = context.getBot().getAllCompany();
+        public void handleInput(BotContext context) throws ExecutionException, InterruptedException {
+            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().getAllCompanies().get();
 
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
@@ -72,12 +77,12 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context, LocationDto locationDto) {
-            List<LinkedHashMap<String, String>> companies = context.getBot().sendGeoLocationToServer(locationDto);
+        public void handleInput(BotContext context, LocationDto locationDto) throws ExecutionException, InterruptedException {
+            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().sendGeoLocation(locationDto).get();
 
             if (companies.isEmpty()) {
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
-                companies = context.getBot().getAllCompany();
+                companies = context.getBot().getTelegramApiService().getAllCompanies().get();
 
                 try {
                     context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
@@ -148,8 +153,16 @@ public enum BotState {
             sendMessage(context, "Песня загружается...");
             sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
+            // самая важная часть - ConcurrentHashMap<long, SongResponse>
+            // именно сюда асинхронно кладутся треки-ответы от сервера,
+            // ключом выступает ИД чата
             try {
-                SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
+                long chatId = context.getTelegramMessage().getChatId();
+                LOGGER.info("ChatID = {}", chatId);
+                SongRequest request = new SongRequest(context.getTelegramMessage());
+                SongResponse temp = context.getBot().getTelegramApiService().approveSong(request).get();
+                map.put(chatId, temp);
+                SongResponse songResponse = map.get(chatId);
 
                 //в контекст передаем позицию искомой песни в очереди song_queue
                 context.getTelegramMessage().setPosition(songResponse.getPosition());
@@ -285,7 +298,8 @@ public enum BotState {
             try {
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
-                context.getBot().addSongToQueue(context.getTelegramMessage());
+                TelegramMessage telegramMessage = context.getTelegramMessage();
+                context.getBot().getTelegramApiService().addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
                 sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -421,16 +435,20 @@ public enum BotState {
         return inputNeeded;
     }
 
-    public void handleInput(BotContext context) {
+    public void handleInput(BotContext context) throws ExecutionException, InterruptedException {
     }
 
     public void handleInput(BotContext context, Update update) {
     }
 
-    public void handleInput(BotContext context, LocationDto locationDto) {
+    public void handleInput(BotContext context, LocationDto locationDto) throws ExecutionException, InterruptedException {
     }
 
     public abstract void enter(BotContext context);
 
     public abstract BotState nextState();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BotState.class);
+
+    private static final ConcurrentHashMap<Long, SongResponse> map = new ConcurrentHashMap<>();
 }

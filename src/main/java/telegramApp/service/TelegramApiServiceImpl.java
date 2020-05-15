@@ -1,10 +1,13 @@
 package telegramApp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import telegramApp.dto.LocationDto;
@@ -13,10 +16,12 @@ import telegramApp.dto.SongResponse;
 import telegramApp.dto.VisitDto;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @PropertySource("classpath:telegram.properties")
 public class TelegramApiServiceImpl implements TelegramApiService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramApiServiceImpl.class);
     private RestTemplate restTemplate;
 
     @Value("${server.path}")
@@ -37,15 +42,17 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
-    public List sendGeoLocation(LocationDto locationDto) {
+    @Async
+    public CompletableFuture<List> sendGeoLocation(LocationDto locationDto) {
         String URL = serverPath + "/api/tlg/location";
-        return restTemplate.postForObject(URL, locationDto, List.class);
+        return CompletableFuture.completedFuture(restTemplate.postForObject(URL, locationDto, List.class));
     }
 
     @Override
-    public List getAllCompanies() {
+    @Async
+    public CompletableFuture<List> getAllCompanies() {
         String URL = serverPath + "/api/tlg/all_company";
-        return restTemplate.postForObject(URL, null, List.class);
+        return CompletableFuture.completedFuture(restTemplate.postForObject(URL, null, List.class));
     }
 
     /**
@@ -57,9 +64,13 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * @return
      */
     @Override
-    public SongResponse approveSong(SongRequest songRequest) {
+    @Async
+    public CompletableFuture<SongResponse> approveSong(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/approve";
-        return restTemplate.postForObject(URL, songRequest, SongResponse.class);
+        LOGGER.info("РЕКВЕСТ = {}-{}", songRequest.getAuthorName(), songRequest.getSongName());
+        SongResponse test = restTemplate.postForObject(URL, songRequest, SongResponse.class);
+        LOGGER.info("ОТВЕТ = {}", test.getTrackName());
+        return CompletableFuture.completedFuture(test);
     }
 
     /**
@@ -69,6 +80,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      * @param companyId
      */
     @Override
+    @Async
     public void addSongToQueue(long songId, long companyId) {
         String URL = serverPath + "/api/tlg/addSongToQueue";
         HttpHeaders headers = new HttpHeaders();
@@ -79,6 +91,7 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     @Override
+    @Async
     public void registerTelegramUserAndVisit(VisitDto visitDto) {
         String URL = serverPath + "/api/tlg/registerTelegramUserAndVisit";
         restTemplate.postForObject(URL, visitDto, Void.class);
