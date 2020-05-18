@@ -7,8 +7,26 @@ public class SongResponse {
     private byte[] track;
     private String trackName;
     private Long position;
+    private boolean isBanned;
 
     public SongResponse() {
+    }
+
+    public void setBanned(boolean banned) {
+        isBanned = banned;
+    }
+
+    public boolean isBanned() {
+        return isBanned;
+    }
+
+    public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Long position, boolean isBanned) {
+        this.chatId = chatId;
+        this.songId = songId;
+        this.track = track;
+        this.trackName = trackName;
+        this.position = position;
+        this.isBanned = isBanned;
     }
 
     public SongResponse(Long chatId, Long songId, byte[] track, String trackName, Long position) {
