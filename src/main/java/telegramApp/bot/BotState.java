@@ -150,20 +150,24 @@ public enum BotState {
             sendAction(context, ActionType.UPLOADAUDIO);
             try {
                 SongResponse songResponse = context.getBot().approveToServer(context.getTelegramMessage());
-
                 //в контекст передаем позицию искомой песни в очереди song_queue
                 context.getTelegramMessage().setPosition(songResponse.getPosition());
-
                 //если песня в очереди
+                if(songResponse.isBanned()) {
+                    sendMessage(context, "Данная песня забаненна");
+                    next = EnterPerformerName;
+                    return;
+                }
+
                 if (songResponse.getPosition() != 0) {
                     sendMessage(context, "Эта песня уже есть в плейлисте...");
                 }
+                    Long songId = songResponse.getSongId();
+                    TelegramMessage telegramMessage = context.getTelegramMessage();
+                    telegramMessage.setSongId(songId);
+                    context.getBot().saveTelegramMessage(telegramMessage);
+                    sendTrack(context, songResponse);
 
-                Long songId = songResponse.getSongId();
-                TelegramMessage telegramMessage = context.getTelegramMessage();
-                telegramMessage.setSongId(songId);
-                context.getBot().saveTelegramMessage(telegramMessage);
-                sendTrack(context, songResponse);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 sendMessage(context, "Такая песня не найдена");
