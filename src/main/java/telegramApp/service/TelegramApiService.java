@@ -7,7 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface TelegramApiService {
 
-    SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
+    //TODO: remove
+//    SongResponse sendAuthorAndSongName(SongRequest telegramMessage);
 
     CompletableFuture<List> sendGeoLocation(LocationDto locationDto);
 
@@ -15,7 +16,11 @@ public interface TelegramApiService {
 
     void addSongToQueue(long songId, long companyId);
 
-    CompletableFuture<SongResponse> approveSong(SongRequest telegramMessage);
+    CompletableFuture<SongsListResponse> databaseSearch(SongRequest songRequest);
+
+    CompletableFuture<SongResponse> loadSong(SongRequest songRequest);
+
+    CompletableFuture<SongResponse> servicesSearch(SongRequest songRequest);
 
     /**
      * Метод регистрирует пользователя Telegram и факт посещения этим пользователем

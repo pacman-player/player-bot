@@ -102,7 +102,8 @@ public class Bot extends TelegramLongPollingBot {
                         telegramMessageService.updateTelegramUser(telegramMessage);
 
                         return;
-                    } else if (state.name().equals("GeoLocation") & !update.getMessage().hasLocation()) {
+                    }
+                    else if (state.name().equals("GeoLocation") & !update.getMessage().hasLocation()) {
                         try {
                             state.handleInput(context);
                         } catch (ExecutionException | InterruptedException e) {
@@ -120,38 +121,45 @@ public class Bot extends TelegramLongPollingBot {
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }
+
+                    boolean inputNeeded;
                     do {
                         state = state.nextState();
-                        state.enter(context);
+                        inputNeeded = state.enter(context);
                     }
-                    while (!state.isInputNeeded());
+                    while (!inputNeeded);
 
                     telegramMessage.setStateId(state.ordinal());
                     telegramMessageService.updateTelegramUser(telegramMessage);
                 } else if (update.hasCallbackQuery()) {
                     chatId = update.getCallbackQuery().getMessage().getChatId();
                     telegramMessage = telegramMessageService.findByChatId(chatId);
-                    text = update.getCallbackQuery().getMessage().getText();
-
                     state = BotState.byId(telegramMessage.getStateId());
 
+                    text = update.getCallbackQuery().getMessage().getText();
                     context = new BotContext(bot, telegramMessage, text);
 
-                    telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
+                    if ("GeoLocation".equals(state.name())) {
+                        telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
 
-                    // Если этот пользовтель Telegram ранее был определен как реальный посетитель
-                    // заведения то регистрируем его и факт посещения этого заведения в БД
-                    if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
-                        registerTelegramUserAndVisit(context.getTelegramMessage());
-                        telegramMessage.setVisitRegistered(true);
-                        telegramMessageService.updateTelegramUser(telegramMessage);
+                        // Если этот пользовтель Telegram ранее был определен как реальный посетитель
+                        // заведения то регистрируем его и факт посещения этого заведения в БД
+                        if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
+                            registerTelegramUserAndVisit(context.getTelegramMessage());
+                            telegramMessage.setVisitRegistered(true);
+                            telegramMessageService.updateTelegramUser(telegramMessage);
+                        }
+                    }
+                    else if ("GetDBSongsList".equals(state.name())) {
+                        telegramMessage.setSongId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id песни
                     }
 
+                    boolean inputNeeded;
                     do {
                         state = state.nextState();
-                        state.enter(context);
+                        inputNeeded = state.enter(context);
                     }
-                    while (!state.isInputNeeded());
+                    while (!inputNeeded);
 
                     telegramMessage.setStateId(state.ordinal());
                     telegramMessageService.updateTelegramUser(telegramMessage);

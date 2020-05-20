@@ -10,10 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import telegramApp.dto.LocationDto;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
-import telegramApp.dto.VisitDto;
+import telegramApp.dto.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -35,11 +32,12 @@ public class TelegramApiServiceImpl implements TelegramApiService {
                 .build();
     }
 
-    @Override
-    public SongResponse sendAuthorAndSongName(SongRequest songRequest) {
-        String URL = serverPath + "/api/tlg/song";
-        return restTemplate.postForObject(URL, songRequest, SongResponse.class);
-    }
+    //TODO: remove
+//    @Override
+//    public SongResponse sendAuthorAndSongName(SongRequest songRequest) {
+//        String URL = serverPath + "/api/tlg/song";
+//        return restTemplate.postForObject(URL, songRequest, SongResponse.class);
+//    }
 
     @Override
     @Async
@@ -56,6 +54,39 @@ public class TelegramApiServiceImpl implements TelegramApiService {
     }
 
     /**
+     * Метод передает на сервер pacman-player-core инфу о песне которую нужно найти. На сервере происодит
+     * происк песни по тэгам в БД. Если подходящие песни найдены, то формируется упорядоченный список из их
+     * названий и id и передается боту. Непосредственно треки для воспроизведения не передается.
+     *
+     * @param songRequest
+     * @return
+     */
+    @Override
+    @Async
+    public CompletableFuture<SongsListResponse> databaseSearch(SongRequest songRequest) {
+        String URL = serverPath + "/api/tlg/database_search";
+        LOGGER.info("РЕКВЕСТ = {}-{}", songRequest.getAuthorName(), songRequest.getSongName());
+        SongsListResponse list = restTemplate.postForObject(URL, songRequest, SongsListResponse.class);
+        LOGGER.info("ОТВЕТ СОДЕРЖИТ СПИСОК ИЗ {} ПЕСЕН", list.getSongs().size());
+        return CompletableFuture.completedFuture(list);
+    }
+
+    /**
+     * Метод загружает с сервера pacman-player-core 30-секундный отрывок песни по её id
+     * @param songRequest
+     * @return
+     */
+    @Override
+    @Async
+    public CompletableFuture<SongResponse> loadSong(SongRequest songRequest) {
+        String URL = serverPath + "/api/tlg/song";
+        LOGGER.info("РЕКВЕСТ = SongId={}", songRequest.getSongId());
+        SongResponse test = restTemplate.postForObject(URL, songRequest, SongResponse.class);
+        LOGGER.info("ОТВЕТ = {}", test.getTrackName());
+        return CompletableFuture.completedFuture(test);
+    }
+
+    /**
      * Метод передает на сервер pacman-player-core инфу о песне которую нужно найти. На сервере песня если
      * скачивается с одного из сервисов по поиску музыки - сохраняется в папку music/ и возвращается в бота с инфой
      * о том какой id у песни на сервере, с 30сек отрезком и полным названием трека.
@@ -65,11 +96,11 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      */
     @Override
     @Async
-    public CompletableFuture<SongResponse> approveSong(SongRequest songRequest) {
-        String URL = serverPath + "/api/tlg/approve";
+    public CompletableFuture<SongResponse> servicesSearch(SongRequest songRequest) {
+        String URL = serverPath + "/api/tlg/services_search";
         LOGGER.info("РЕКВЕСТ = {}-{}", songRequest.getAuthorName(), songRequest.getSongName());
         SongResponse test = restTemplate.postForObject(URL, songRequest, SongResponse.class);
-        LOGGER.info("ОТВЕТ = {}", test.getTrackName());
+        LOGGER.info("ОТВЕТ = {}", test == null ? "пусто" : test.getTrackName());
         return CompletableFuture.completedFuture(test);
     }
 
