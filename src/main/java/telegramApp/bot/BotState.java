@@ -57,8 +57,8 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(BotContext context) throws ExecutionException, InterruptedException {
-            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().getAllCompanies().get();
+        public void handleInput(BotContext context) {
+            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().getAllCompanies().join();
 
             try {
                 context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
@@ -69,11 +69,11 @@ public enum BotState {
 
         @Override
         public void handleInput(BotContext context, LocationDto locationDto) throws ExecutionException, InterruptedException {
-            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().sendGeoLocation(locationDto).get();
+            List<LinkedHashMap<String, String>> companies = context.getBot().getTelegramApiService().sendGeoLocation(locationDto).join();
 
             if (companies.isEmpty()) {
                 sendMessage(context, "Не удалось получить геоданные. Попробуйте выбрать заведение из списка вручную.");
-                companies = context.getBot().getTelegramApiService().getAllCompanies().get();
+                companies = context.getBot().getTelegramApiService().getAllCompanies().join();
 
                 try {
                     context.getBot().execute(sendInlineKeyBoardMessageListOfCompanies(context.getTelegramMessage().getChatId(), companies));
@@ -153,7 +153,7 @@ public enum BotState {
                 SongsListResponse list = listMap.get(chatId);
                 if (list == null) {
                     SongRequest request = new SongRequest(context.getTelegramMessage());
-                    SongsListResponse tmp = context.getBot().getTelegramApiService().databaseSearch(request).get();
+                    SongsListResponse tmp = context.getBot().getTelegramApiService().databaseSearch(request).join();
                     listMap.put(chatId, tmp);
                     list = listMap.get(chatId);
                 }
@@ -234,7 +234,7 @@ public enum BotState {
                 long chatId = context.getTelegramMessage().getChatId();
                 LOGGER.info("ChatID = {}", chatId);
                 SongRequest request = new SongRequest(context.getTelegramMessage());
-                SongResponse temp = context.getBot().getTelegramApiService().servicesSearch(request).get();
+                SongResponse temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
                 map.put(chatId, temp);
                 SongResponse songResponse = map.get(chatId);
 
