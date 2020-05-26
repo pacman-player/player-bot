@@ -2,6 +2,7 @@ package telegramApp.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
@@ -234,8 +235,15 @@ public enum BotState {
                 long chatId = context.getTelegramMessage().getChatId();
                 LOGGER.info("ChatID = {}", chatId);
                 SongRequest request = new SongRequest(context.getTelegramMessage());
-                SongResponse temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
-                map.put(chatId, temp);
+                ResponseEntity<SongResponse> temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
+                if (!context.getTelegramMessage().isRepeat() && temp.getStatusCodeValue() == 228) {
+                    String message = temp.getHeaders().get("Timer").toString();
+                    sendMessage(context, String.format("Вы можете выполнить следующий поиск в " +
+                            "музыкальных сервисах через %s сек.", message));
+                    next = EnterPerformerName;
+                    return false;
+                }
+                map.put(chatId, temp.getBody());
                 SongResponse songResponse = map.get(chatId);
 
                 processSong(context, songResponse);
@@ -245,7 +253,7 @@ public enum BotState {
                 ex.printStackTrace();
                 sendMessage(context, "Такая песня не найдена");
                 next = EnterPerformerName;
-
+                context.getTelegramMessage().setRepeat(false);
                 return false;
             }
         }
@@ -283,6 +291,7 @@ public enum BotState {
             if (text.equals("Да")) {
                 //получаю из контекста позицию искомой песни в song_queue
                 Long position = context.getTelegramMessage().getPosition();
+                context.getTelegramMessage().setRepeat(false);
                 if (position == 0) {
                     //TODO: fix payment
                     //next = Payment;
@@ -313,11 +322,13 @@ public enum BotState {
                 if (list.getSongs().isEmpty()) {
                     listMap.remove(chatId);
                     sendMessage(context, "Ищу на других сервисах...");
+                    context.getTelegramMessage().setRepeat(true);
                     next = SearchSongByServices;
                 } else {
                     next = GetDBSongsList;
                 }
             } else {
+                context.getTelegramMessage().setRepeat(false);
                 next = EnterPerformerName;
             }
         }

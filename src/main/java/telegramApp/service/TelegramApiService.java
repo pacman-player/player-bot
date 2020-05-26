@@ -1,5 +1,6 @@
 package telegramApp.service;
 
+import org.springframework.http.ResponseEntity;
 import telegramApp.dto.*;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface TelegramApiService {
 
     CompletableFuture<SongResponse> loadSong(SongRequest songRequest);
 
-    CompletableFuture<SongResponse> servicesSearch(SongRequest songRequest);
+    CompletableFuture<ResponseEntity<SongResponse>> servicesSearch(SongRequest songRequest);
 
     /**
      * Метод регистрирует пользователя Telegram и факт посещения этим пользователем

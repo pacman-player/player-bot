@@ -7,6 +7,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -96,12 +97,12 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      */
     @Override
     @Async
-    public CompletableFuture<SongResponse> servicesSearch(SongRequest songRequest) {
+    public CompletableFuture<ResponseEntity<SongResponse>> servicesSearch(SongRequest songRequest) {
         String URL = serverPath + "/api/tlg/services_search";
         LOGGER.info("РЕКВЕСТ = {}-{}", songRequest.getAuthorName(), songRequest.getSongName());
-        SongResponse test = restTemplate.postForObject(URL, songRequest, SongResponse.class);
-        LOGGER.info("ОТВЕТ = {}", test == null ? "пусто" : test.getTrackName());
-        return CompletableFuture.completedFuture(test);
+        ResponseEntity<SongResponse> response = restTemplate.postForEntity(URL, songRequest, SongResponse.class);
+        LOGGER.info("ОТВЕТ = {}", response.getBody() == null ? "пусто" : response.getBody().getTrackName());
+        return CompletableFuture.completedFuture(response);
     }
 
     /**
