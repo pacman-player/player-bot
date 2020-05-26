@@ -321,6 +321,7 @@ public enum BotState {
                 long songId = context.getTelegramMessage().getSongId();
                 SongsListResponse list = listMap.get(chatId);
                 if (list == null) {
+                    context.getTelegramMessage().setRepeat(true);
                     next = SearchSongByServices;
                     return;
                 }
