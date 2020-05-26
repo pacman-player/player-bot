@@ -29,9 +29,11 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 public enum BotState {
-    Start() {
+    Start {
         @Override
         public boolean enter(BotContext context) {
+            long chatId = context.getTelegramMessage().getChatId();
+            listMap.remove(chatId);
             sendMessage(context, "Привет");
             return false;
         }
@@ -42,7 +44,7 @@ public enum BotState {
         }
     },
 
-    GeoLocation() {
+    GeoLocation {
         @Override
         public boolean enter(BotContext context) {
             sendMessage(context, "Отправьте местоположение, чтобы бот мог определить ваше заведение \n\nили \n\nвыберите заведение из списка");
@@ -101,6 +103,8 @@ public enum BotState {
     EnterPerformerName {
         @Override
         public boolean enter(BotContext context) {
+            long chatId = context.getTelegramMessage().getChatId();
+            listMap.remove(chatId);
             sendMessage(context, "Введите исполнителя");
             return true;
         }
@@ -160,7 +164,7 @@ public enum BotState {
                 }
 
                 if (list.getSongs().isEmpty()) {
-                    sendMessage(context, "Песня не найдена в БД. Продолжаем поиск на муз.сервисах");
+                    sendMessage(context, "Песня не найдена в БД.");
                     next = SearchSongByServices;
                     return false;
                 }
@@ -170,7 +174,7 @@ public enum BotState {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                sendMessage(context, "Песня не найдена в БД. Продолжаем поиск на муз.сервисах");
+                sendMessage(context, "Песня не найдена в БД.");
                 next = SearchSongByServices;
                 return false;
             }
@@ -225,6 +229,10 @@ public enum BotState {
 
         @Override
         public boolean enter(BotContext context) {
+            long chatId = context.getTelegramMessage().getChatId();
+            listMap.remove(chatId);
+            sendMessage(context, "Продолжаем поиск на муз.сервисах");
+
             next = ApproveSong;
             sendAnimation(context, "https://media.giphy.com/media/QCJvAY0aFxZgPn1Ok1/giphy.gif", 20, 20);
             sendAction(context, ActionType.UPLOADAUDIO);
@@ -232,7 +240,6 @@ public enum BotState {
             // именно сюда асинхронно кладутся треки-ответы от сервера,
             // ключом выступает ИД чата
             try {
-                long chatId = context.getTelegramMessage().getChatId();
                 LOGGER.info("ChatID = {}", chatId);
                 SongRequest request = new SongRequest(context.getTelegramMessage());
                 ResponseEntity<SongResponse> temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
@@ -288,7 +295,9 @@ public enum BotState {
 
         public void handleInput(BotContext context) {
             String text = context.getInput();
+            long chatId = context.getTelegramMessage().getChatId();
             if (text.equals("Да")) {
+                listMap.remove(chatId);
                 //получаю из контекста позицию искомой песни в song_queue
                 Long position = context.getTelegramMessage().getPosition();
                 context.getTelegramMessage().setRepeat(false);
@@ -309,9 +318,12 @@ public enum BotState {
                 }
 
             } else if (text.equals("Нет")) {
-                long chatId = context.getTelegramMessage().getChatId();
                 long songId = context.getTelegramMessage().getSongId();
                 SongsListResponse list = listMap.get(chatId);
+                if (list == null) {
+                    next = SearchSongByServices;
+                    return;
+                }
                 Iterator<BotSongDto> iter = list.getSongs().iterator();
                 while (iter.hasNext()) {
                     BotSongDto song = iter.next();
@@ -320,9 +332,6 @@ public enum BotState {
                     }
                 }
                 if (list.getSongs().isEmpty()) {
-                    listMap.remove(chatId);
-                    sendMessage(context, "Ищу на других сервисах...");
-                    context.getTelegramMessage().setRepeat(true);
                     next = SearchSongByServices;
                 } else {
                     next = GetDBSongsList;
@@ -387,7 +396,7 @@ public enum BotState {
         }
     },
 
-    Approved() {
+    Approved {
         @Override
         public boolean enter(BotContext context) {
             try {
@@ -477,10 +486,19 @@ public enum BotState {
             rowList.add(keyboardButtonsRow);
         }
 
+        InlineKeyboardButton escButton = new InlineKeyboardButton();
+        escButton.setText("Ничего не подходит");
+        escButton.setCallbackData(String.valueOf(0L));
+
+        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+        keyboardButtonsRow.add(escButton);
+
+        rowList.add(keyboardButtonsRow);
+
         inlineKeyboardMarkup.setKeyboard(rowList);
 
         SendMessage sendMessage = new SendMessage().setChatId(chatId)
-                .setText("Песни, найденные в базе данных (выберете одну):").setReplyMarkup(inlineKeyboardMarkup);
+                .setText("Песни, найденные в базе данных (выберите одну):").setReplyMarkup(inlineKeyboardMarkup);
 
         return sendMessage;
     }
