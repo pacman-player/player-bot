@@ -250,11 +250,11 @@ public enum BotState {
                     next = EnterPerformerName;
                     return false;
                 }
+              
                 map.put(chatId, temp.getBody());
                 SongResponse songResponse = map.get(chatId);
-
+              
                 processSong(context, songResponse);
-
                 return false;
             } catch (Exception ex) {
                 ex.printStackTrace();
