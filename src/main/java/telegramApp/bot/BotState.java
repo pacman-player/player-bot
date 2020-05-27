@@ -243,7 +243,7 @@ public enum BotState {
                 LOGGER.info("ChatID = {}", chatId);
                 SongRequest request = new SongRequest(context.getTelegramMessage());
                 ResponseEntity<SongResponse> temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
-                if (!context.getTelegramMessage().isRepeat() && temp.getStatusCodeValue() == 228) {
+                if (temp.getStatusCodeValue() == 228) {
                     String message = temp.getHeaders().get("Timer").toString();
                     sendMessage(context, String.format("Вы можете выполнить следующий поиск в " +
                             "музыкальных сервисах через %s сек.", message));
@@ -260,7 +260,6 @@ public enum BotState {
                 ex.printStackTrace();
                 sendMessage(context, "Такая песня не найдена");
                 next = EnterPerformerName;
-                context.getTelegramMessage().setRepeat(false);
                 return false;
             }
         }
@@ -300,7 +299,6 @@ public enum BotState {
                 listMap.remove(chatId);
                 //получаю из контекста позицию искомой песни в song_queue
                 Long position = context.getTelegramMessage().getPosition();
-                context.getTelegramMessage().setRepeat(false);
                 if (position == 0) {
                     //TODO: fix payment
                     //next = Payment;
@@ -321,7 +319,6 @@ public enum BotState {
                 long songId = context.getTelegramMessage().getSongId();
                 SongsListResponse list = listMap.get(chatId);
                 if (list == null) {
-                    context.getTelegramMessage().setRepeat(true);
                     next = SearchSongByServices;
                     return;
                 }
@@ -338,7 +335,6 @@ public enum BotState {
                     next = GetDBSongsList;
                 }
             } else {
-                context.getTelegramMessage().setRepeat(false);
                 next = EnterPerformerName;
             }
         }

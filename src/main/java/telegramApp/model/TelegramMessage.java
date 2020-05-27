@@ -34,9 +34,6 @@ public class TelegramMessage {
     @Embedded
     private TelegramUser telegramUser;
 
-    @Transient
-    private boolean isRepeat;
-
     /**
      * Для принятия решения о записи в базу данных на сервер pacman-player-core
      * факта посещения пользователем Telegram заведения (Company) нам нужно
@@ -144,13 +141,5 @@ public class TelegramMessage {
 
     public void setVisitRegistered(boolean visitRegistered) {
         isVisitRegistered = visitRegistered;
-    }
-
-    public boolean isRepeat() {
-        return isRepeat;
-    }
-
-    public void setRepeat(boolean repeat) {
-        isRepeat = repeat;
     }
 }

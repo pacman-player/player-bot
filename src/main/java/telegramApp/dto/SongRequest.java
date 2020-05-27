@@ -8,7 +8,6 @@ public class SongRequest {
     private String songName;
     private Long songId;
     private Long companyId;
-    private boolean isRepeat;
 
     public SongRequest(Long chatId, String authorName, String songName, Long songId) {
         this.chatId = chatId;
@@ -23,7 +22,6 @@ public class SongRequest {
         this.songName = telegramMessage.getSongName();
         this.songId = telegramMessage.getSongId();
         this.companyId = telegramMessage.getCompanyId();
-        this.isRepeat = telegramMessage.isRepeat();
     }
 
     public SongRequest(Long chatId, String authorName, String songName) {
@@ -70,13 +68,5 @@ public class SongRequest {
 
     public void setCompanyId(Long companyId) {
         this.companyId = companyId;
-    }
-
-    public boolean isRepeat() {
-        return isRepeat;
-    }
-
-    public void setRepeat(boolean repeat) {
-        isRepeat = repeat;
     }
 }
