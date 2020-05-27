@@ -151,7 +151,19 @@ public class Bot extends TelegramLongPollingBot {
                         }
                     }
                     else if ("GetDBSongsList".equals(state.name())) {
-                        telegramMessage.setSongId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id песни
+                        Long songId = Long.valueOf(update.getCallbackQuery().getData());
+                        if (songId == 0L) {
+                            state = BotState.SearchSongByServices;
+                            boolean inputNeeded = state.enter(context);
+                            telegramMessage.setStateId(state.ordinal());
+                            telegramMessageService.updateTelegramUser(telegramMessage);
+                            if (inputNeeded) {
+                                return;
+                            }
+                        }
+                        else {
+                            telegramMessage.setSongId(songId); //сетим id песни
+                        }
                     }
 
                     boolean inputNeeded;
