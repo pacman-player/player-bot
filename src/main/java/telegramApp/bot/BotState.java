@@ -2,6 +2,7 @@ package telegramApp.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.*;
@@ -241,18 +242,24 @@ public enum BotState {
             try {
                 LOGGER.info("ChatID = {}", chatId);
                 SongRequest request = new SongRequest(context.getTelegramMessage());
-                SongResponse temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
-                map.put(chatId, temp);
+                ResponseEntity<SongResponse> temp = context.getBot().getTelegramApiService().servicesSearch(request).join();
+                if (temp.getStatusCodeValue() == 228) {
+                    String message = temp.getHeaders().get("Timer").toString();
+                    sendMessage(context, String.format("Вы можете выполнить следующий поиск в " +
+                            "музыкальных сервисах через %s сек.", message));
+                    next = EnterPerformerName;
+                    return false;
+                }
+              
+                map.put(chatId, temp.getBody());
                 SongResponse songResponse = map.get(chatId);
-
+              
                 processSong(context, songResponse);
-
                 return false;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 sendMessage(context, "Такая песня не найдена");
                 next = EnterPerformerName;
-
                 return false;
             }
         }
