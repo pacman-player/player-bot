@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Component
 public enum BotState {
@@ -302,7 +303,7 @@ public enum BotState {
                 if (position == 0) {
                     //TODO: fix payment
                     //next = Payment;
-                    next = Approved;
+                    next = Payment;
                 } else {
                     if (position < 11) {
                         sendMessage(context, "Эта песня уже близко =)");
@@ -393,6 +394,7 @@ public enum BotState {
         }
     },
 
+
     Approved {
         @Override
         public boolean enter(BotContext context) {
@@ -400,8 +402,12 @@ public enum BotState {
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
                 TelegramMessage telegramMessage = context.getTelegramMessage();
-                context.getBot().getTelegramApiService().addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
-                sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
+                boolean isAdded = context.getBot().getTelegramApiService().addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId()).get();
+                if (isAdded){
+                    sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
+                } else {
+                    sendMessage(context, "Что-то пошло не так");
+                }
                 return false;
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -409,7 +415,6 @@ public enum BotState {
                 return false;
             }
         }
-
         @Override
         public BotState nextState() {
             return EnterPerformerName;
