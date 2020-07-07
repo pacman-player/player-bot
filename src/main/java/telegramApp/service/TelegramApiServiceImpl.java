@@ -7,17 +7,14 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import telegramApp.dto.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 @Service
 @PropertySource("classpath:telegram.properties")
@@ -116,18 +113,13 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      */
     @Override
     @Async
-    public Future<Boolean> addSongToQueue(long songId, long companyId) {
-            String URL = serverPath + "/api/tlg/addSongToQueue";
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("songId", String.valueOf(songId));
-            headers.add("companyId", String.valueOf(companyId));
-            HttpEntity httpEntity = new HttpEntity(headers);
-            ResponseEntity response = restTemplate.postForEntity(URL, httpEntity, Void.class);
-            boolean isAdded = false;
-            if (response.getStatusCode() == HttpStatus.OK){
-                isAdded = true;
-            }
-            return new AsyncResult<>(isAdded);
+    public void addSongToQueue(long songId, long companyId) {
+        String URL = serverPath + "/api/tlg/addSongToQueue";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("songId", String.valueOf(songId));
+        headers.add("companyId", String.valueOf(companyId));
+        HttpEntity httpEntity = new HttpEntity(headers);
+        restTemplate.postForObject(URL, httpEntity, Void.class);
     }
 
     @Override
