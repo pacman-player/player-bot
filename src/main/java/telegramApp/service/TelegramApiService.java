@@ -5,7 +5,6 @@ import telegramApp.dto.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public interface TelegramApiService {
 
@@ -16,7 +15,7 @@ public interface TelegramApiService {
 
     CompletableFuture<List> getAllCompanies();
 
-    Future<Boolean> addSongToQueue(long songId, long companyId);
+    void addSongToQueue(long songId, long companyId);
 
     CompletableFuture<SongsListResponse> databaseSearch(SongRequest songRequest);
 
