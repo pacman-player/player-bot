@@ -113,13 +113,13 @@ public class TelegramApiServiceImpl implements TelegramApiService {
      */
     @Override
     @Async
-    public void addSongToQueue(long songId, long companyId) {
+    public CompletableFuture<Boolean> addSongToQueue(long songId, long companyId) {
         String URL = serverPath + "/api/tlg/addSongToQueue";
         HttpHeaders headers = new HttpHeaders();
         headers.add("songId", String.valueOf(songId));
         headers.add("companyId", String.valueOf(companyId));
         HttpEntity httpEntity = new HttpEntity(headers);
-        restTemplate.postForObject(URL, httpEntity, Void.class);
+        return CompletableFuture.completedFuture(restTemplate.postForObject(URL, httpEntity, Boolean.class));
     }
 
     @Override
