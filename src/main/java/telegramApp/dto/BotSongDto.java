@@ -14,6 +14,12 @@ public class BotSongDto {
         this.trackName = trackName;
     }
 
+    public BotSongDto(Long songId, String trackName, boolean banned) {
+        this.songId = songId;
+        this.trackName = trackName;
+        this.banned = banned;
+    }
+
     public Long getSongId() {
         return songId;
     }

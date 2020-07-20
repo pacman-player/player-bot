@@ -169,14 +169,17 @@ public enum BotState {
                     return false;
                 }
 
-                /* возможно стоит укказать данные по песне.
-                А лчше настроить проверку на бан после нажатия на песню. Для этого переделать конструтор?
-                 */
-                list.getSongs().forEach(banned -> {
-                    if (banned.isBanned()) {
-                        sendMessage(context, "Забанено");
+
+                int countSongsAuthor = 0;
+                for (BotSongDto botSongDto : list.getSongs()) {
+                    if (botSongDto.isBanned()) {
+                        sendMessage(context, botSongDto.getTrackName() + "Данная композиция запрещена к воспроизведению в этом заведении");
+                        countSongsAuthor++;
                     }
-                });
+                    if (countSongsAuthor > 0){
+                        next = EnterPerformerName;
+                    }
+                }
 
                 context.getBot().execute(sendInlineKeyBoardMessageListOfSongs(chatId, list));
                 return true;
