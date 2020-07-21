@@ -153,34 +153,37 @@ public enum BotState {
             // именно сюда асинхронно кладутся списки от сервера,
             // ключом выступает ИД чата
             long chatId = context.getTelegramMessage().getChatId();
+            int countForCancel = 0;
             LOGGER.info("ChatID = {}", chatId);
             try {
+
                 SongsListResponse list = listMap.get(chatId);
                 if (list == null) {
                     SongRequest request = new SongRequest(context.getTelegramMessage());
                     SongsListResponse tmp = context.getBot().getTelegramApiService().databaseSearch(request).join();
+                    Iterator<BotSongDto> botSongDtoIterator = tmp.getSongs().iterator();
+                    while (botSongDtoIterator.hasNext()){
+                        BotSongDto botSongDto = botSongDtoIterator.next();
+                        if (botSongDto.isBanned()) {
+                            sendMessage(context, botSongDto.getTrackName() + "Данная композиция запрещена к воспроизведению в этом заведении");
+                            botSongDtoIterator.remove();
+                            countForCancel++;
+                        }
+                    }
                     listMap.put(chatId, tmp);
                     list = listMap.get(chatId);
                 }
 
-                if (list.getSongs().isEmpty()) {
+                if (list.getSongs().isEmpty() && countForCancel == 0) {
                     sendMessage(context, "Песня не найдена в БД.");
                     next = SearchSongByServices;
                     return false;
                 }
 
-
-                int countSongsAuthor = 0;
-                for (BotSongDto botSongDto : list.getSongs()) {
-                    if (botSongDto.isBanned()) {
-                        sendMessage(context, botSongDto.getTrackName() + "Данная композиция запрещена к воспроизведению в этом заведении");
-                        countSongsAuthor++;
-                    }
-                    if (countSongsAuthor > 0){
-                        next = EnterPerformerName;
-                    }
+                if (list.getSongs().isEmpty()) {
+                    next = EnterPerformerName;
+                    return false;
                 }
-
                 context.getBot().execute(sendInlineKeyBoardMessageListOfSongs(chatId, list));
                 return true;
 
