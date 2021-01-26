@@ -317,7 +317,7 @@ public enum BotState {
                 if (position == 0) {
                     //TODO: fix payment
                     //next = Payment;
-                    next = Approved;
+                    next = Payment;
                 } else {
                     if (position < 11) {
                         sendMessage(context, "Эта песня уже близко =)");
@@ -415,14 +415,19 @@ public enum BotState {
                 //DUPLICATE LINES
 //                context.getBot().sendSongIdToServer(context.getTelegramMessage());
                 TelegramMessage telegramMessage = context.getTelegramMessage();
-                context.getBot().getTelegramApiService().addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
-                sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
-                return false;
+                boolean check = context.getBot().getTelegramApiService().addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId()).join();
+                if (check){
+                    sendMessage(context, "Песня добавлена в очередь. Вы можете заказать ещё одну.");
+
+                } else {
+                    sendMessage(context, "Что-то пошло не так");
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
                 sendMessage(context, "Что-то пошло не так");
                 return false;
             }
+            return false;
         }
 
         @Override

@@ -15,7 +15,7 @@ public interface TelegramApiService {
 
     CompletableFuture<List> getAllCompanies();
 
-    void addSongToQueue(long songId, long companyId);
+    CompletableFuture<Boolean> addSongToQueue(long songId, long companyId);
 
     CompletableFuture<SongsListResponse> databaseSearch(SongRequest songRequest);
 
