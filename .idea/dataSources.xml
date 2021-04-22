@@ -5,10 +5,13 @@
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/tlg_bot</jdbc-url>
-      <driver-properties>
-        <property name="serverTimezone" value="UTC" />
-      </driver-properties>
+      <jdbc-url>jdbc:mysql://localhost:3306/tlg_bot?serverTimezone=Europe/Moscow&amp;verifyServerCertificate=false&amp;useSSL=true&amp;useUnicode=true&amp;characterEncoding=utf8</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="tlg_bot@localhost [2]" uuid="e82d72d4-f96b-4f41-9fa7-c241a0f5cac0">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/tlg_bot</jdbc-url>
     </data-source>
   </component>
 </project>

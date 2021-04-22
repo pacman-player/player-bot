@@ -11,14 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import telegramApp.dto.SongRequest;
-import telegramApp.dto.SongResponse;
+import telegramApp.dto.*;
 import telegramApp.model.TelegramMessage;
 import telegramApp.service.TelegramApiService;
 import telegramApp.service.TelegramMessageService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Component
 @PropertySource("classpath:telegram.properties")
@@ -43,55 +43,156 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     @Override
-    public void onUpdateReceived(Update update) {
-        BotContext context;
-        BotState state;
-        String text;
+    public void onUpdateReceived(Update update) { //переопределенный метод является асинхронным
+        Bot bot = this;
+        new Thread(new Runnable() { //запуск нового потока
+            @Override
+            public void run() {
+                TelegramMessage telegramMessage;
+                final long chatId;
+                BotContext context;
+                BotState state;
+                String text;
 
-        if (!update.hasMessage()) {
-            paymentPreCheckout(update);
-            return;
-        }
+                if (update.hasMessage()) {
+                    chatId = update.getMessage().getChatId();
+                    telegramMessage = telegramMessageService.findByChatId(chatId);
 
-        if (update.getMessage().hasText()) {
-            text = update.getMessage().getText();
-        } else {
-            text = "";
-        }
+                    if (update.getMessage().hasText()) {
+                        text = update.getMessage().getText();
+                    } else {
+                        text = "";
+                    }
 
-        final long chatId = update.getMessage().getChatId();
-        TelegramMessage telegramMessage = telegramMessageService.findByChatId(chatId);
+                    if (telegramMessage == null) {
+                        state = BotState.getInitialState();
+                        telegramMessage = new TelegramMessage(update.getMessage().getFrom(), state.ordinal());
+                        telegramMessageService.addTelegramUser(telegramMessage);
+                        context = new BotContext(bot, telegramMessage, text, update);
+                        state.enter(context);
+                    } else {
+                        if (text.equals("/start")) {
+                            state = BotState.getInitialState();
+                        } else {
+                            state = BotState.byId(telegramMessage.getStateId());
+                        }
 
-        if (telegramMessage == null) {
-            state = BotState.getInitialState();
-            telegramMessage = new TelegramMessage(chatId, state.ordinal());
-            telegramMessageService.addTelegramUser(telegramMessage);
+                        if (state.name().equals("Payment")) {
+                            context = new BotContext(bot, telegramMessage, text, update.getMessage().getSuccessfulPayment());
+                        } else {
+                            context = new BotContext(bot, telegramMessage, text);
+                        }
+                    }
 
-            context = new BotContext(this, telegramMessage, text);
-            state.enter(context);
-        } else {
-            if (text.equals("Отмена")) {
-                state = BotState.Start;
-            } else {
-                state = BotState.byId(telegramMessage.getStateId());
+                    if (update.getMessage().hasLocation()) {
+                        context = new BotContext(bot, telegramMessage, text, update);
+                        try {
+                            state.handleInput(context, new LocationDto(
+                                    context.getUpdate().getMessage().getLocation().getLatitude(),
+                                    context.getUpdate().getMessage().getLocation().getLongitude()));
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        telegramMessage.setStateId(state.ordinal());
+
+                        // Обозначаем текущего пользователя как реального посетителя,
+                        // так как он поделился с нами своей геопозицией.
+                        telegramMessage.setTelegramUserSharedGeolocation(true);
+                        telegramMessageService.updateTelegramUser(telegramMessage);
+
+                        return;
+                    }
+                    else if (state.name().equals("GeoLocation") & !update.getMessage().hasLocation()) {
+                        try {
+                            state.handleInput(context);
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        telegramMessage.setStateId(state.ordinal());
+                        telegramMessageService.updateTelegramUser(telegramMessage);
+
+                        return;
+                    }
+
+                    try {
+                        state.handleInput(context);
+                    } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    boolean inputNeeded;
+                    do {
+                        state = state.nextState();
+                        inputNeeded = state.enter(context);
+                    }
+                    while (!inputNeeded);
+
+                    telegramMessage.setStateId(state.ordinal());
+                    telegramMessageService.updateTelegramUser(telegramMessage);
+                } else if (update.hasCallbackQuery()) {
+                    chatId = update.getCallbackQuery().getMessage().getChatId();
+                    telegramMessage = telegramMessageService.findByChatId(chatId);
+                    state = BotState.byId(telegramMessage.getStateId());
+
+                    text = update.getCallbackQuery().getMessage().getText();
+                    context = new BotContext(bot, telegramMessage, text);
+
+                    if ("GeoLocation".equals(state.name())) {
+                        telegramMessage.setCompanyId(Long.valueOf(update.getCallbackQuery().getData())); //сетим id компании
+
+                        // Если этот пользовтель Telegram ранее был определен как реальный посетитель
+                        // заведения то регистрируем его и факт посещения этого заведения в БД
+                        if (telegramMessage.isTelegramUserSharedGeolocation() && "GeoLocation".equals(state.name())) {
+                            registerTelegramUserAndVisit(context.getTelegramMessage());
+                            telegramMessage.setVisitRegistered(true);
+                            telegramMessageService.updateTelegramUser(telegramMessage);
+                        }
+                    }
+                    else if ("GetDBSongsList".equals(state.name())) {
+                        Long songId = Long.valueOf(update.getCallbackQuery().getData());
+                        if (songId == 0L) {
+                            state = BotState.SearchSongByServices;
+                            boolean inputNeeded = state.enter(context);
+                            telegramMessage.setStateId(state.ordinal());
+                            telegramMessageService.updateTelegramUser(telegramMessage);
+                            if (inputNeeded) {
+                                return;
+                            }
+                        }
+                        else {
+                            telegramMessage.setSongId(songId); //сетим id песни
+                        }
+                    }
+
+                    boolean inputNeeded;
+                    do {
+                        state = state.nextState();
+                        inputNeeded = state.enter(context);
+                    }
+                    while (!inputNeeded);
+
+                    telegramMessage.setStateId(state.ordinal());
+                    telegramMessageService.updateTelegramUser(telegramMessage);
+                } else if (update.hasPreCheckoutQuery()) {
+                    paymentPreCheckout(update);
+                }
             }
+        }).start();
+    }
 
-            if (state.name().equals("Payment")) {
-                context = new BotContext(this, telegramMessage, text, update.getMessage().getSuccessfulPayment());
-            } else {
-                context = new BotContext(this, telegramMessage, text);
-            }
-        }
-
-        state.handleInput(context);
-        do {
-            state = state.nextState();
-            state.enter(context);
-        }
-        while (!state.isInputNeeded());
-
-        telegramMessage.setStateId(state.ordinal());
-        telegramMessageService.updateTelegramUser(telegramMessage);
+    /**
+     * Метод регистрирует в нашей базе данных на сервере pacman-player-core
+     * пользователя Telegram и факт посещения этим пользователем заведения
+     *
+     * @param telegramMessage
+     */
+    void registerTelegramUserAndVisit(TelegramMessage telegramMessage) {
+        TelegramUser telegramUser = telegramMessage.getTelegramUser();
+        Long companyId = telegramMessage.getCompanyId();
+        VisitDto visitDto = new VisitDto(telegramUser, companyId);
+        telegramApiService.registerTelegramUserAndVisit(visitDto);
     }
 
     private void paymentPreCheckout(Update update) {
@@ -102,6 +203,15 @@ public class Bot extends TelegramLongPollingBot {
             answer.setOk(true);
             answer.setPreCheckoutQueryId(query.getId());
             success = true;
+
+            // Если этот пользовтель Telegram ранее был определен как реальный посетитель заведения,
+            // то после выбора заведения он был внесен в нашу БД и вносить его ещё раз не нужно.
+            TelegramMessage telegramMessage = telegramMessageService.findByChatId(update.getPreCheckoutQuery().getFrom().getId());
+            if (!telegramMessage.isVisitRegistered()) {
+                registerTelegramUserAndVisit(telegramMessage);
+                telegramMessage.setVisitRegistered(true);
+                telegramMessageService.updateTelegramUser(telegramMessage);
+            }
         } else {
             answer.setOk(false);
             answer.setErrorMessage("Что-то пошло не так, попробуйте сначала");
@@ -122,21 +232,37 @@ public class Bot extends TelegramLongPollingBot {
             telegramMessageService.updateTelegramUser(telegramMessage);
         }
     }
-
-    SongResponse sendToServer(TelegramMessage telegramMessage) {
-        SongRequest songRequest = new SongRequest(telegramMessage);
-        return telegramApiService.sendAuthorAndSongName(songRequest);
-    }
-
-    SongResponse approveToServer(TelegramMessage telegramMessage) {
-        SongRequest songRequest = new SongRequest(telegramMessage);
-        return telegramApiService.approveSong(songRequest);
-    }
-
-    void sendSongIdToServer(TelegramMessage telegramMessage) {
-        SongRequest songRequest = new SongRequest(telegramMessage);
-        telegramApiService.approveSong(songRequest);
-    }
+    /*
+    Все методы ниже являются кандидатами на удаление, так как обращение к TelegramApiService
+    выполняется через геттер на поле в этом классе. Такая реализация обусловлена тем, что
+    нельзя вызывать ASYNC методы Спринга внутри класса
+     */
+//    SongResponse sendToServer(TelegramMessage telegramMessage) {
+//        SongRequest songRequest = new SongRequest(telegramMessage);
+//        return telegramApiService.sendAuthorAndSongName(songRequest);
+//    }
+//
+//    synchronized SongResponse approveToServer(TelegramMessage telegramMessage) throws ExecutionException, InterruptedException {
+//        SongRequest songRequest = new SongRequest(telegramMessage);
+//        return telegramApiService.approveSong(songRequest).get();
+//    }
+//
+//    void sendSongIdToServer(TelegramMessage telegramMessage) {
+//        SongRequest songRequest = new SongRequest(telegramMessage);
+//        telegramApiService.approveSong(songRequest);
+//    }
+//
+//    List sendGeoLocationToServer(LocationDto locationDto) throws ExecutionException, InterruptedException {
+//        return telegramApiService.sendGeoLocation(locationDto).get();
+//    }
+//
+//    void addSongToQueue(TelegramMessage telegramMessage) {
+//        telegramApiService.addSongToQueue(telegramMessage.getSongId(), telegramMessage.getCompanyId());
+//    }
+//
+//    List getAllCompany() throws ExecutionException, InterruptedException {
+//        return telegramApiService.getAllCompanies().get();
+//    }
 
     TelegramMessage getTelegramMessageFromDB(Long chatId) {
         return telegramMessageService.findByChatId(chatId);
@@ -176,5 +302,9 @@ public class Bot extends TelegramLongPollingBot {
 
     public String getProviderToken() {
         return providerToken;
+    }
+
+    public TelegramApiService getTelegramApiService() {
+        return telegramApiService;
     }
 }
